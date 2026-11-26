@@ -1,0 +1,61 @@
+/* ===========================
+   variables.css — 열혈 소년만화 · 아케이드 디자인 토큰
+   =========================== */
+:root {
+  /* 브랜드 & 액션 컬러 */
+  --color-primary:        #2563EB; /* 일렉트릭 블루 — 히라가나 / 기본 액션 */
+  --color-primary-dark:   #1D4ED8;
+  --color-primary-soft:   #DBEAFE;
+
+  --color-secondary:      #E11D48; /* 버밀리온 레드 — 카타카나 / 배틀 */
+  --color-secondary-dark: #BE123C;
+  --color-secondary-soft: #FFE4E6;
+
+  --color-accent:         #FACC15; /* 아케이드 골드 — 별 / 콤보 / 강조 */
+  --color-accent-dark:    #EAB308;
+  --color-accent-soft:    #FEF9C3;
+
+  --color-success:        #10B981; /* 에메랄드 — 정답 */
+  --color-success-soft:   #D1FAE5;
+  --color-error:          #EF4444; /* 코랄 레드 — 오답 */
+  --color-error-soft:     #FEE2E2;
+
+  /* 만화 지면 & 잉크 */
+  --color-bg:             #FFFDF5; /* 따뜻한 만화책 지면 */
+  --color-halftone:       #E6DEC8; /* 망점 도트 색 */
+  --color-surface:        #FFFFFF;
+  --color-surface-alt:    #F8FAFC;
+  --color-ink:            #1E1B2E; /* 진한 먹색 잉크 */
+  --color-text:           #1E1B2E;
+  --color-muted:          #52506A;
+  --color-border:         #1E1B2E;
+  --color-border-soft:    #CBD5E1;
+
+  /* 폰트 */
+  --font-display: 'Do Hyeon', 'Noto Sans KR', sans-serif;
+  --font-ko:      'Noto Sans KR', sans-serif;
+  --font-ja:      'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
+
+  /* 간격 */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  36px;
+
+  /* 둥글기 */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+
+  /* 코믹 테두리 & 하드 섀도우 */
+  --border-ink:      3px solid var(--color-ink);
+  --border-ink-thin: 2px solid var(--color-ink);
+  --shadow-comic:    5px 5px 0 var(--color-ink);
+  --shadow-comic-sm: 3px 3px 0 var(--color-ink);
+  --shadow-comic-lg: 7px 7px 0 var(--color-ink);
+
+  /* 전환 */
+  --transition: 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}

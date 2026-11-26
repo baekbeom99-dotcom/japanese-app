@@ -1,0 +1,360 @@
+/* ===========================
+   components.css — 아케이드 & 만화 UI 컴포넌트
+   =========================== */
+
+/* ── 공통 패널 & 말풍선 ──────────────────────────────── */
+.comic-panel {
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: var(--border-ink);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-comic);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.speech-bubble {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-surface);
+  border: var(--border-ink-thin);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-comic-sm);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.mascot-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+/* ── 버튼 (아케이드 프레스 스타일) ───────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 10px 20px;
+  border: var(--border-ink-thin);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-comic-sm);
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  letter-spacing: 0.02em;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+  white-space: nowrap;
+}
+
+.btn:not(:disabled):hover {
+  transform: translate(-1px, -2px);
+  box-shadow: var(--shadow-comic);
+}
+
+.btn:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--color-ink);
+}
+
+.btn--sm {
+  min-height: 36px;
+  padding: 5px 12px;
+  font-size: 0.9rem;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn--primary:not(:disabled):hover {
+  background: var(--color-primary-dark);
+}
+
+.btn--secondary {
+  background: var(--color-secondary);
+  color: #fff;
+}
+
+.btn--secondary:not(:disabled):hover {
+  background: var(--color-secondary-dark);
+}
+
+.btn--accent {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.btn--accent:not(:disabled):hover {
+  background: var(--color-accent-dark);
+}
+
+.btn--ghost {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.btn--ghost:not(:disabled):hover {
+  background: var(--color-primary-soft);
+}
+
+.btn--danger {
+  background: var(--color-error);
+  color: #fff;
+}
+
+.btn--link {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
+  color: var(--color-muted);
+  font-family: var(--font-ko);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.btn--link:not(:disabled):hover {
+  background: var(--color-surface);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-comic-sm);
+  color: var(--color-ink);
+}
+
+.btn--bookmark.bookmarked {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* ── 탭 ──────────────────────────────────────────────── */
+.tab {
+  min-height: 44px;
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--color-muted);
+  transition: background var(--transition), color var(--transition);
+}
+
+.tab:not(:disabled):hover {
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+}
+
+.tab--active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-comic-sm);
+}
+
+.tab--active.tab--katakana {
+  background: var(--color-secondary);
+}
+
+/* ── 배지 / 콤보 / 경고 ──────────────────────────────── */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: var(--border-ink-thin);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.pill-badge--gold {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.combo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background: var(--color-secondary);
+  color: #fff;
+  border: var(--border-ink-thin);
+  border-radius: 999px;
+  box-shadow: var(--shadow-comic-sm);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  animation: combo-pop 0.3s ease;
+}
+
+.combo-badge--fever {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.inline-alert {
+  padding: 10px 14px;
+  border: var(--border-ink-thin);
+  border-radius: var(--radius-md);
+  background: var(--color-error-soft);
+  color: #991B1B;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+/* ── 아케이드 게이지 바 ──────────────────────────────── */
+.arcade-meter {
+  width: 100%;
+  height: 14px;
+  background: var(--color-surface-alt);
+  border: var(--border-ink-thin);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.arcade-meter__fill,
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #60A5FA);
+  border-right: 2px solid var(--color-ink);
+  transition: width 0.45s ease;
+  animation: bar-grow 0.5s ease both;
+}
+
+.bar-fill--success {
+  background: linear-gradient(90deg, var(--color-success), #34D399);
+}
+
+.bar-fill--gold {
+  background: linear-gradient(90deg, #F59E0B, var(--color-accent));
+}
+
+/* ── 퀴즈 보기 버튼 ──────────────────────────────────── */
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 68px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: var(--border-ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-comic);
+  font-family: var(--font-ja);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-ink);
+  text-align: left;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.quiz-option__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: var(--border-ink-thin);
+  background: var(--color-accent-soft);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.quiz-option:not(:disabled):hover {
+  background: var(--color-primary-soft);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-comic-lg);
+}
+
+.quiz-option:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-comic-sm);
+}
+
+.quiz-option.correct {
+  background: var(--color-success-soft);
+  border-color: var(--color-ink);
+  color: #065F46;
+}
+
+.quiz-option.correct .quiz-option__num {
+  background: var(--color-success);
+  color: #fff;
+}
+
+.quiz-option.wrong {
+  background: var(--color-error-soft);
+  border-color: var(--color-ink);
+  color: #991B1B;
+}
+
+.quiz-option.wrong .quiz-option__num {
+  background: var(--color-error);
+  color: #fff;
+}
+
+/* ── 문제 박스 내부 일본풍 무늬 & 사쿠라 음영 ────────── */
+.stage-motif-overlay,
+.sakura-shadow-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.stage-motif-overlay {
+  opacity: 0.95;
+}
+
+.sakura-shadow-overlay {
+  opacity: 0;
+}
+
+.sakura-shadow-overlay.active {
+  animation: sakura-shadow-bloom 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stage-motif-svg,
+.sakura-shadow-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── 키프레임 ────────────────────────────────────────── */
+@keyframes bar-grow {
+  from { width: 0; }
+}
+
+@keyframes combo-pop {
+  0%   { transform: scale(0.8); }
+  60%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@keyframes sakura-shadow-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.76) rotate(-6deg);
+  }
+  28% {
+    opacity: 1;
+    transform: scale(1.02) rotate(2deg);
+  }
+  100% {
+    opacity: 0.72;
+    transform: scale(1.08) rotate(5deg);
+  }
+}
