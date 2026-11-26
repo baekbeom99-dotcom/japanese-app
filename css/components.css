@@ -358,3 +358,329 @@
     transform: scale(1.08) rotate(5deg);
   }
 }
+
+/* ── 아바타 상점 & 탈의실 (#avatar) ──────────────────── */
+.avatar-screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.avatar-stage-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, #FEF9C3 0%, #FFFFFF 60%, #FFE4E6 100%);
+  border: var(--border-ink);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-comic);
+}
+
+.avatar-preview-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-preview-shuriken {
+  position: absolute;
+  right: -8px;
+  bottom: 4px;
+  animation: shuriken-idle-spin 4s linear infinite;
+}
+
+.avatar-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.avatar-equipped-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.avatar-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--space-md);
+}
+
+.avatar-item-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: var(--border-ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-comic);
+}
+
+.avatar-item-card--equipped {
+  background: var(--color-accent-soft);
+}
+
+.avatar-item-card__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 86px;
+  background: var(--color-surface-alt);
+  border: var(--border-ink-thin);
+  border-radius: var(--radius-md);
+}
+
+.avatar-item-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.avatar-item-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.avatar-item-card__name {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+}
+
+.avatar-item-card__desc {
+  font-size: 0.84rem;
+  color: var(--color-muted);
+  flex: 1;
+}
+
+.avatar-item-card__actions {
+  margin-top: 4px;
+}
+
+.avatar-item-card__actions .btn {
+  width: 100%;
+}
+
+/* ── 퀴즈 표창 던지기 배틀 아레나 ─────────────────────── */
+.quiz-arena {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+  padding: 6px 12px;
+  background: rgba(255, 253, 245, 0.86);
+  border: var(--border-ink-thin);
+  border-radius: var(--radius-lg);
+}
+
+.quiz-arena__ninja,
+.quiz-arena__target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quiz-arena__lane {
+  position: relative;
+  height: 48px;
+  overflow: visible;
+}
+
+.quiz-arena__shuriken {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.quiz-arena.arena--hit .quiz-arena__shuriken {
+  animation: shuriken-fly-hit 0.42s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+.quiz-arena.arena--miss .quiz-arena__shuriken {
+  animation: shuriken-fly-miss 0.55s ease-out forwards;
+}
+
+.quiz-arena.arena--hit .quiz-arena__target {
+  animation: target-hit-shake 0.38s ease 0.25s;
+}
+
+.quiz-arena.arena--miss .quiz-arena__target {
+  animation: target-miss-dodge 0.45s ease 0.2s;
+}
+
+@keyframes shuriken-idle-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes shuriken-fly-hit {
+  0% {
+    opacity: 1;
+    transform: translate(0, 4px) rotate(0deg) scale(0.9);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(calc(100% + 160px), -4px) rotate(540deg) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(100% + 210px), 0) rotate(720deg) scale(0.75);
+  }
+}
+
+@keyframes shuriken-fly-miss {
+  0% {
+    opacity: 1;
+    transform: translate(0, 6px) rotate(0deg) scale(0.9);
+  }
+  65% {
+    opacity: 1;
+    transform: translate(calc(100% + 140px), -48px) rotate(420deg) scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(100% + 250px), -74px) rotate(680deg) scale(0.6);
+  }
+}
+
+@keyframes target-hit-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(8px) rotate(10deg); }
+  55% { transform: translateX(-6px) rotate(-8deg); }
+  80% { transform: translateX(4px) rotate(4deg); }
+}
+
+@keyframes target-miss-dodge {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(10px) scale(0.96); }
+}
+
+/* ── 카드 학습 좌우 닌자 시바견 & 액션 ────────────────── */
+.card-arena {
+  display: grid;
+  grid-template-columns: auto minmax(0, 380px) auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.ninja-guard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ninja-action--slash {
+  animation: ninja-act-slash 0.48s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.ninja-action--kick {
+  animation: ninja-act-kick 0.48s ease;
+}
+
+.ninja-action--jump {
+  animation: ninja-act-jump 0.52s cubic-bezier(0.25, 0.85, 0.35, 1);
+}
+
+.ninja-action--poof {
+  animation: ninja-act-poof 0.48s ease;
+}
+
+.ninja-action--dash {
+  animation: ninja-act-dash 0.45s ease;
+}
+
+.ninja-action--meditate {
+  animation: ninja-act-meditate 0.55s ease;
+}
+
+@keyframes ninja-act-slash {
+  0%   { transform: translateX(0) rotate(0deg); }
+  40%  { transform: translateX(14px) rotate(10deg) scale(1.06); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes ninja-act-kick {
+  0%   { transform: translateY(0) rotate(0deg); }
+  45%  { transform: translateY(-12px) rotate(-14deg) scale(1.07); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes ninja-act-jump {
+  0%   { transform: translateY(0) rotate(0deg); }
+  45%  { transform: translateY(-22px) rotate(360deg) scale(1.08); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+
+@keyframes ninja-act-poof {
+  0%   { transform: scale(0.75); opacity: 0.45; }
+  50%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes ninja-act-dash {
+  0%   { transform: translateX(-14px) skewX(-8deg); }
+  50%  { transform: translateX(12px) skewX(6deg); }
+  100% { transform: translateX(0) skewX(0deg); }
+}
+
+@keyframes ninja-act-meditate {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px) scale(1.04); }
+}
+
+@media (max-width: 680px) {
+  .avatar-stage-card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .avatar-equipped-list,
+  .avatar-stage-card .mode-toggle-group {
+    justify-content: center;
+  }
+
+  .card-arena {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .card-arena .flip-stage {
+    grid-column: 1 / -1;
+    order: 1;
+    margin: 0 auto;
+  }
+
+  .card-arena .ninja-guard--left {
+    order: 2;
+  }
+
+  .card-arena .ninja-guard--right {
+    order: 3;
+  }
+
+  .ninja-guard svg {
+    width: 78px;
+    height: 78px;
+  }
+
+  .quiz-arena svg {
+    max-width: 68px;
+    max-height: 68px;
+  }
+}

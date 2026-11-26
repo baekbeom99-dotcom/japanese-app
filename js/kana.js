@@ -9,6 +9,8 @@ const KanaModule = (() => {
   let _quizMode     = 'kana-to-roma'; // 'kana-to-roma' | 'roma-to-kana'
   let _cardIndex    = 0;
   let _cards        = [];
+  let _cardAction   = 0;
+  let _cardAnimate  = false;
   let _quizTimer    = null;
   let _activeQuiz   = false;
   let _quizRound    = 0;
@@ -236,6 +238,8 @@ const KanaModule = (() => {
   function _startCard() {
     _cards = _buildPool(_selectedRows);
     _cardIndex = 0;
+    _cardAction = 0;
+    _cardAnimate = false;
     _renderCard();
   }
 
@@ -243,6 +247,9 @@ const KanaModule = (() => {
     const root = document.getElementById('app-root');
     const card = _cards[_cardIndex];
     const ac = new AbortController();
+    const guards = AvatarModule.renderCardGuards(_cardAction, _cardAnimate);
+    _cardAnimate = false;
+
     Router.onCleanup(() => {
       ac.abort();
       SpeechHelper.stop();
@@ -256,18 +263,24 @@ const KanaModule = (() => {
           <span class="pill-badge">${card.row}</span>
         </div>
 
-        <div class="flip-stage">
-          <div class="flip-card" id="flip-card" role="button" tabindex="0" aria-label="가나 카드 뒤집기">
-            <div class="flip-card__front">
-              <span class="flip-card__tag">${_currentType === 'hiragana' ? '히라가나' : '카타카나'}</span>
-              <span class="kana-big">${card.kana}</span>
-            </div>
-            <div class="flip-card__back">
-              <span class="flip-card__tag">읽는 소리</span>
-              <span class="roma-big">${SpeechHelper.formatReading(card.kana, card.roma)}</span>
-              <span class="kana-big" style="font-size:2.4rem">${card.kana}</span>
+        <div class="pill-badge pill-badge--gold" id="card-action-pill">${guards.action.label}</div>
+
+        <div class="card-arena">
+          ${guards.leftHtml}
+          <div class="flip-stage">
+            <div class="flip-card" id="flip-card" role="button" tabindex="0" aria-label="가나 카드 뒤집기">
+              <div class="flip-card__front">
+                <span class="flip-card__tag">${_currentType === 'hiragana' ? '히라가나' : '카타카나'}</span>
+                <span class="kana-big">${card.kana}</span>
+              </div>
+              <div class="flip-card__back">
+                <span class="flip-card__tag">읽는 소리</span>
+                <span class="roma-big">${SpeechHelper.formatReading(card.kana, card.roma)}</span>
+                <span class="kana-big" style="font-size:2.4rem">${card.kana}</span>
+              </div>
             </div>
           </div>
+          ${guards.rightHtml}
         </div>
 
         <div class="card-controls-row">
@@ -288,17 +301,21 @@ const KanaModule = (() => {
 
     const flipCardEl = document.getElementById('flip-card');
     const toggleFlip = () => flipCardEl.classList.toggle('flipped');
+    const moveCard = (delta) => {
+      const nextIdx = _cardIndex + delta;
+      if (nextIdx < 0 || nextIdx >= _cards.length) return;
+      _cardIndex = nextIdx;
+      _cardAction += 1;
+      _cardAnimate = true;
+      _renderCard();
+    };
 
     flipCardEl.addEventListener('click', toggleFlip, { signal: ac.signal });
     _bindSpeechStatus(ac.signal);
     document.getElementById('btn-back-kana').addEventListener('click', () => renderSelectScreen(), { signal: ac.signal });
     document.getElementById('btn-speak').addEventListener('click', () => SpeechHelper.speak(card.kana), { signal: ac.signal });
-    document.getElementById('btn-prev')?.addEventListener('click', () => {
-      if (_cardIndex > 0) { _cardIndex--; _renderCard(); }
-    }, { signal: ac.signal });
-    document.getElementById('btn-next')?.addEventListener('click', () => {
-      if (_cardIndex < _cards.length - 1) { _cardIndex++; _renderCard(); }
-    }, { signal: ac.signal });
+    document.getElementById('btn-prev')?.addEventListener('click', () => moveCard(-1), { signal: ac.signal });
+    document.getElementById('btn-next')?.addEventListener('click', () => moveCard(1), { signal: ac.signal });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === ' ' || e.key === 'Enter') {
@@ -306,12 +323,10 @@ const KanaModule = (() => {
           e.preventDefault();
           toggleFlip();
         }
-      } else if (e.key === 'ArrowLeft' && _cardIndex > 0) {
-        _cardIndex--;
-        _renderCard();
-      } else if (e.key === 'ArrowRight' && _cardIndex < _cards.length - 1) {
-        _cardIndex++;
-        _renderCard();
+      } else if (e.key === 'ArrowLeft') {
+        moveCard(-1);
+      } else if (e.key === 'ArrowRight') {
+        moveCard(1);
       } else if (e.key.toLowerCase() === 's') {
         SpeechHelper.speak(card.kana);
       }
@@ -394,6 +409,7 @@ const KanaModule = (() => {
           <div class="stage-motif-overlay" aria-hidden="true">${AnimeSVG.quizStageBackdrop(_quizRound * 13 + idx)}</div>
           <div class="sakura-shadow-overlay" id="sakura-shadow-overlay" aria-hidden="true">${AnimeSVG.sakuraStageShadow(_quizRound * 13 + idx)}</div>
           <div class="speed-lines-overlay">${AnimeSVG.speedLines()}</div>
+          ${AvatarModule.renderQuizArena(_quizRound * 13 + idx)}
           ${q.isRetry ? '<span class="pill-badge pill-badge--gold" style="position:relative;z-index:2">🔁 다시 도전 문제!</span>' : ''}
           <div class="quiz-question ${_quizMode === 'kana-to-roma' ? 'kana-huge' : 'meaning-huge'}">${_quizMode === 'kana-to-roma' ? q.question : _formatRomaLabel(q.question)}</div>
           <div class="quiz-hint-area">
@@ -428,16 +444,17 @@ const KanaModule = (() => {
       const stage = document.getElementById('quiz-stage');
       const sakuraOverlay = document.getElementById('sakura-shadow-overlay');
       const msgEl = document.getElementById('quiz-mascot-msg');
+      AvatarModule.triggerQuizThrow(result.correct);
       if (result.correct) {
         stage?.classList.add('quiz-stage--burst');
         sakuraOverlay?.classList.add('active');
-        if (msgEl) msgEl.textContent = result.streak >= 3 ? `완벽해! ${result.streak}연속 정답!!` : '정답! 아주 잘했어!';
+        if (msgEl) msgEl.textContent = result.streak >= 3 ? `명중! ${result.streak}연속 콤보!!` : '명중! 아주 잘했어!';
       } else {
         const answerLabel = _quizMode === 'kana-to-roma' ? _formatRomaLabel(result.answer) : result.answer;
-        if (msgEl) msgEl.textContent = `아깝다! 정답은 "${answerLabel}" 이야!`;
+        if (msgEl) msgEl.textContent = `앗, 빗나갔다! 정답은 "${answerLabel}" 이야!`;
       }
 
-      _quizTimer = setTimeout(() => QuizEngine.next(), result.correct ? 850 : 1300);
+      _quizTimer = setTimeout(() => QuizEngine.next(), result.correct ? 1050 : 1450);
     };
 
     _bindSpeechStatus(ac.signal);

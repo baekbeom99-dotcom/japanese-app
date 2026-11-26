@@ -50,6 +50,7 @@ const ProgressModule = (() => {
             <span class="pill-badge pill-badge--gold">★ 별 ${state.stars}개</span>
             <span class="pill-badge">🔥 최고 ${state.bestCombo} 콤보</span>
             <span class="pill-badge">🏅 도장 ${state.stamps.length} / ${STAMP_DEFINITIONS.length}</span>
+            <a href="#avatar" class="btn btn--accent btn--sm">🎨 아바타 꾸미기</a>
           </div>
         </div>
 

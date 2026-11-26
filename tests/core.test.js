@@ -31,17 +31,38 @@ test('Router는 화면 전환 시 등록된 cleanup 콜백을 모두 실행하�
 });
 
 test('AnimeSVG는 유효한 viewBox, xmlns, 고유 ID를 가진 Parametric SVG를 생성한다', () => {
+  const dataCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'data.js'), 'utf8');
   const code = fs.readFileSync(path.join(__dirname, '..', 'js', 'svg.js'), 'utf8');
   const ctx = {};
-  vm.runInNewContext(code + '\nthis.__AnimeSVG = AnimeSVG;', ctx);
+  vm.runInNewContext(dataCode + '\n' + code + '\nthis.__AnimeSVG = AnimeSVG; this.__AVATAR_ITEMS = AVATAR_ITEMS;', ctx);
   const AnimeSVG = ctx.__AnimeSVG;
+  const AVATAR_ITEMS = ctx.__AVATAR_ITEMS;
 
-  const m1 = AnimeSVG.mascot('happy', 120);
-  const m2 = AnimeSVG.mascot('encourage', 120);
+  const m1 = AnimeSVG.mascot('happy', 120, {
+    equipped: { outfit: 'outfit_flame', headband: 'headband_crown', shuriken: 'shuriken_fuma', weapon: 'weapon_katana' },
+    pose: 'slash',
+  });
+  const m2 = AnimeSVG.mascot('encourage', 120, { pose: 'kick', flipX: true });
   assert.match(m1, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
-  assert.match(m1, /viewBox="0 0 160 160"/);
+  assert.match(m1, /viewBox="0 0 180 180"/);
   assert.match(m1, /role="img"/);
+  assert.match(m1, /id="mascot-weapon"/);
+  assert.match(m2, /scale\(-1, 1\)/);
   assert.notEqual(m1, m2);
+
+  for (const kind of ['straw_doll', 'bullseye', 'apple', 'watermelon', 'daruma']) {
+    const t = AnimeSVG.quizTarget(kind, 'idle', 88);
+    assert.match(t, /viewBox="0 0 110 110"/);
+    assert.match(t, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+  }
+
+  for (const item of AVATAR_ITEMS) {
+    const preview = AnimeSVG.avatarItemPreview(item, 56);
+    assert.match(preview, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+  }
+
+  const shu = AnimeSVG.shurikenItem('shuriken_sakura', 44);
+  assert.match(shu, /viewBox="-30 -30 60 60"/);
 
   const b1 = AnimeSVG.stampBadge({ id: 'first_quiz', title: '첫 도장', kanji: '初', color: '#2563EB' }, true);
   assert.match(b1, /viewBox="-50 -50 100 100"/);

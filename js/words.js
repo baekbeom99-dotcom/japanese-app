@@ -7,6 +7,8 @@ const WordsModule = (() => {
   let _selectedKey = null;
   let _studyPool   = [];
   let _cardIndex   = 0;
+  let _cardAction  = 0;
+  let _cardAnimate = false;
   let _quizTimer   = null;
   let _activeQuiz  = false;
   let _quizConfig  = null; // { key, pool, label }
@@ -166,6 +168,8 @@ const WordsModule = (() => {
     _selectedKey = key;
     _studyPool = (WORDS[key] || []).map(w => ({ ...w, key }));
     _cardIndex = 0;
+    _cardAction = 0;
+    _cardAnimate = false;
     _renderWordCard();
   }
 
@@ -175,6 +179,8 @@ const WordsModule = (() => {
     _selectedKey = 'bookmarks';
     _studyPool = items;
     _cardIndex = 0;
+    _cardAction = 0;
+    _cardAnimate = false;
     _renderWordCard();
   }
 
@@ -184,6 +190,8 @@ const WordsModule = (() => {
     const isMarked = Storage.load().bookmarks.includes(w.word);
     const cat = WORD_CATEGORIES.find(c => c.key === w.key);
     const ac = new AbortController();
+    const guards = AvatarModule.renderCardGuards(_cardAction, _cardAnimate);
+    _cardAnimate = false;
 
     Router.onCleanup(() => {
       ac.abort();
@@ -198,18 +206,24 @@ const WordsModule = (() => {
           <span class="pill-badge">${cat ? cat.label : '★ 북마크'}</span>
         </div>
 
-        <div class="flip-stage">
-          <div class="flip-card" id="flip-card" role="button" tabindex="0" aria-label="단어 카드 뒤집기">
-            <div class="flip-card__front">
-              <span class="flip-card__tag">일본어</span>
-              <span class="word-big">${w.word}</span>
-            </div>
-            <div class="flip-card__back">
-              <span class="flip-card__tag">뜻과 발음</span>
-              <span class="meaning-big">${w.meaning}</span>
-              <span class="roma-small">${SpeechHelper.formatReading(w.word, w.roma)}</span>
+        <div class="pill-badge pill-badge--gold" id="card-action-pill">${guards.action.label}</div>
+
+        <div class="card-arena">
+          ${guards.leftHtml}
+          <div class="flip-stage">
+            <div class="flip-card" id="flip-card" role="button" tabindex="0" aria-label="단어 카드 뒤집기">
+              <div class="flip-card__front">
+                <span class="flip-card__tag">일본어</span>
+                <span class="word-big">${w.word}</span>
+              </div>
+              <div class="flip-card__back">
+                <span class="flip-card__tag">뜻과 발음</span>
+                <span class="meaning-big">${w.meaning}</span>
+                <span class="roma-small">${SpeechHelper.formatReading(w.word, w.roma)}</span>
+              </div>
             </div>
           </div>
+          ${guards.rightHtml}
         </div>
 
         <div class="card-controls-row">
@@ -238,18 +252,22 @@ const WordsModule = (() => {
       _notifyStateChanged();
       _renderWordCard();
     };
+    const moveCard = (delta) => {
+      const nextIdx = _cardIndex + delta;
+      if (nextIdx < 0 || nextIdx >= _studyPool.length) return;
+      _cardIndex = nextIdx;
+      _cardAction += 1;
+      _cardAnimate = true;
+      _renderWordCard();
+    };
 
     flipEl.addEventListener('click', toggleFlip, { signal: ac.signal });
     _bindSpeechStatus(ac.signal);
     document.getElementById('btn-back-words').addEventListener('click', () => Router.navigate('#words'), { signal: ac.signal });
     document.getElementById('btn-speak').addEventListener('click', () => SpeechHelper.speak(w.word), { signal: ac.signal });
     document.getElementById('btn-bm').addEventListener('click', toggleBm, { signal: ac.signal });
-    document.getElementById('btn-prev')?.addEventListener('click', () => {
-      if (_cardIndex > 0) { _cardIndex--; _renderWordCard(); }
-    }, { signal: ac.signal });
-    document.getElementById('btn-next')?.addEventListener('click', () => {
-      if (_cardIndex < _studyPool.length - 1) { _cardIndex++; _renderWordCard(); }
-    }, { signal: ac.signal });
+    document.getElementById('btn-prev')?.addEventListener('click', () => moveCard(-1), { signal: ac.signal });
+    document.getElementById('btn-next')?.addEventListener('click', () => moveCard(1), { signal: ac.signal });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === ' ' || e.key === 'Enter') {
@@ -257,12 +275,10 @@ const WordsModule = (() => {
           e.preventDefault();
           toggleFlip();
         }
-      } else if (e.key === 'ArrowLeft' && _cardIndex > 0) {
-        _cardIndex--;
-        _renderWordCard();
-      } else if (e.key === 'ArrowRight' && _cardIndex < _studyPool.length - 1) {
-        _cardIndex++;
-        _renderWordCard();
+      } else if (e.key === 'ArrowLeft') {
+        moveCard(-1);
+      } else if (e.key === 'ArrowRight') {
+        moveCard(1);
       } else if (e.key.toLowerCase() === 's') {
         SpeechHelper.speak(w.word);
       } else if (e.key.toLowerCase() === 'b') {
@@ -357,6 +373,7 @@ const WordsModule = (() => {
           <div class="stage-motif-overlay" aria-hidden="true">${AnimeSVG.quizStageBackdrop(_quizRound * 17 + idx)}</div>
           <div class="sakura-shadow-overlay" id="sakura-shadow-overlay" aria-hidden="true">${AnimeSVG.sakuraStageShadow(_quizRound * 17 + idx)}</div>
           <div class="speed-lines-overlay">${AnimeSVG.speedLines()}</div>
+          ${AvatarModule.renderQuizArena(_quizRound * 17 + idx)}
           ${q.isRetry ? '<span class="pill-badge pill-badge--gold" style="position:relative;z-index:2">🔁 다시 도전 문제!</span>' : ''}
           <div class="quiz-question meaning-huge">${q.question}</div>
           <div class="quiz-hint-area">
@@ -409,15 +426,16 @@ const WordsModule = (() => {
       const stage = document.getElementById('quiz-stage');
       const sakuraOverlay = document.getElementById('sakura-shadow-overlay');
       const msgEl = document.getElementById('quiz-mascot-msg');
+      AvatarModule.triggerQuizThrow(result.correct);
       if (result.correct) {
         stage?.classList.add('quiz-stage--burst');
         sakuraOverlay?.classList.add('active');
-        if (msgEl) msgEl.textContent = result.streak >= 3 ? `최고야! ${result.streak}연속 콤보!!` : '정답! 단어 실력이 쑥쑥 늘고 있어!';
+        if (msgEl) msgEl.textContent = result.streak >= 3 ? `명중! ${result.streak}연속 콤보!!` : '명중! 단어 실력이 쑥쑥 늘고 있어!';
       } else {
-        if (msgEl) msgEl.textContent = `정답은 "${result.answer}" · ${SpeechHelper.formatReading(result.answer, q.hint)} 이야!`;
+        if (msgEl) msgEl.textContent = `앗, 빗나갔다! 정답은 "${result.answer}" · ${SpeechHelper.formatReading(result.answer, q.hint)} 이야!`;
       }
 
-      _quizTimer = setTimeout(() => QuizEngine.next(), result.correct ? 900 : 1400);
+      _quizTimer = setTimeout(() => QuizEngine.next(), result.correct ? 1050 : 1450);
     };
 
     document.querySelectorAll('.quiz-option').forEach(btn => {

@@ -336,4 +336,42 @@ const LEVEL_TITLES = [
   { level:5, minStars:180, title:'전설의 도장 관장', badge:'👑' },
 ];
 
+// ── 아바타 상점 카테고리 & 아이템 (옷·헤어밴드·표창·무기류) ──
+const AVATAR_CATEGORIES = [
+  { key:'outfit',   label:'닌자 옷',   icon:'🥋' },
+  { key:'headband', label:'헤어밴드',  icon:'🎀' },
+  { key:'shuriken', label:'표창',      icon:'✴️' },
+  { key:'weapon',   label:'무기류',    icon:'⚔️' },
+];
+
+const AVATAR_ITEMS = [
+  // 옷 (outfit)
+  { id:'outfit_basic',  category:'outfit', name:'파란 수련 도복',    price:0,  primary:'#2563EB', trim:'#FACC15', desc:'도장 입문생의 깔끔한 기본 도복' },
+  { id:'outfit_flame',  category:'outfit', name:'불꽃 열혈 도복',    price:15, primary:'#DC2626', trim:'#FDE047', desc:'불타는 열정이 담긴 붉은 도복!' },
+  { id:'outfit_shadow', category:'outfit', name:'질풍 밤닌자복',     price:25, primary:'#312E81', trim:'#38BDF8', desc:'어둠 속을 달리는 비밀 닌자 복장' },
+  { id:'outfit_sakura', category:'outfit', name:'사쿠라 축제 유카타', price:35, primary:'#DB2777', trim:'#FBCFE8', desc:'벚꽃 잎이 수놓아진 화사한 옷' },
+  { id:'outfit_gold',   category:'outfit', name:'황금 관장 도복',    price:60, primary:'#D97706', trim:'#FEF08A', desc:'전설의 관장만 입는 번쩍번쩍 도복' },
+
+  // 헤어밴드 (headband)
+  { id:'headband_basic',   category:'headband', name:'기본 별 아대',      price:0,  color:'#2563EB', emblem:'star',    desc:'반짝이는 별이 달린 기본 헤어밴드' },
+  { id:'headband_thunder', category:'headband', name:'번개 닌자 아대',    price:10, color:'#EAB308', emblem:'bolt',    desc:'스피드가 오르는 번개 문양 아대!' },
+  { id:'headband_sakura',  category:'headband', name:'벚꽃 리본 아대',    price:20, color:'#EC4899', emblem:'sakura',  desc:'봄바람처럼 상큼한 벚꽃 아대' },
+  { id:'headband_dragon',  category:'headband', name:'불꽃 용 뿔 아대',   price:30, color:'#B91C1C', emblem:'horns',   desc:'씩씩한 용의 뿔이 달린 아대' },
+  { id:'headband_crown',   category:'headband', name:'황금 챔피언 왕관',  price:50, color:'#F59E0B', emblem:'crown',   desc:'도장 최고 실력자의 황금 왕관!' },
+
+  // 표창 (shuriken)
+  { id:'shuriken_classic', category:'shuriken', name:'강철 4날 표창',     price:0,  color:'#94A3B8', rim:'#1E1B2E', shape:'four',   desc:'가장 기본이 되는 튼튼한 수리검' },
+  { id:'shuriken_sakura',  category:'shuriken', name:'벚꽃 5날 표창',     price:12, color:'#FB7185', rim:'#9F1239', shape:'sakura', desc:'날아갈 때 벚꽃처럼 빛나는 표창!' },
+  { id:'shuriken_ice',     category:'shuriken', name:'얼음 수정 표창',    price:22, color:'#38BDF8', rim:'#0369A1', shape:'ice',    desc:'차가운 얼음 결정 모양의 6날 표창' },
+  { id:'shuriken_flame',   category:'shuriken', name:'화염 6날 표창',     price:32, color:'#F97316', rim:'#9A3412', shape:'flame',  desc:'불꽃 회오리를 일으키는 뜨거운 표창' },
+  { id:'shuriken_fuma',    category:'shuriken', name:'황금 풍마수리검',   price:55, color:'#FACC15', rim:'#854D0E', shape:'fuma',   desc:'거대한 날개가 회전하는 전설의 표창!' },
+
+  // 무기류 (weapon)
+  { id:'weapon_stick',  category:'weapon', name:'나무 수련검',        price:0,  color:'#B45309', accent:'#FDE68A', kind:'bokken', desc:'기본 자세를 연습하는 나무 검' },
+  { id:'weapon_kunai',  category:'weapon', name:'닌자 쿠나이',        price:12, color:'#64748B', accent:'#EF4444', kind:'kunai',  desc:'빨간 끈이 달린 날렵한 닌자 단검' },
+  { id:'weapon_scroll', category:'weapon', name:'비전 인술 두루마리', price:20, color:'#10B981', accent:'#FDE047', kind:'scroll', desc:'비밀 일본어 주문이 적힌 두루마리!' },
+  { id:'weapon_fan',    category:'weapon', name:'천둥 철부채',        price:30, color:'#2563EB', accent:'#FACC15', kind:'fan',    desc:'한 번 흔들면 바람이 부는 멋진 부채' },
+  { id:'weapon_katana', category:'weapon', name:'무지개 명검',        price:50, color:'#7C3AED', accent:'#F472B6', kind:'katana', desc:'보랏빛 오라가 빛나는 전설의 검!' },
+];
+
 // 단어 총계: 10 + 15 + 15 + 15 + 10 + 20 + 15 = 100개

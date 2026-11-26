@@ -6,16 +6,31 @@
 const Storage = (() => {
   const KEY = 'jp_app_state';
 
+  const DEFAULT_AVATAR = {
+    owned: ['outfit_basic', 'headband_basic', 'shuriken_classic', 'weapon_stick'],
+    equipped: {
+      outfit:   'outfit_basic',
+      headband: 'headband_basic',
+      shuriken: 'shuriken_classic',
+      weapon:   'weapon_stick',
+    },
+  };
+
   /** 매 호출마다 새 기본 상태 객체를 생성하여 반환 */
   function _createDefault() {
     return {
       kana: {},         // { "あ행": { correct: 0, total: 0 } }
       words: {},        // { "basic_greeting": { correct: 0, total: 0 } }
       bookmarks: [],    // 북마크된 단어 목록
-      stars: 0,         // 누적 별 개수
+      stars: 0,         // 사용 가능한 보유 별 (지갑)
+      totalStars: 0,    // 지금까지 모은 누적 별 (레벨·도장용)
       bestCombo: 0,     // 역대 최고 콤보
       totalQuizzes: 0,  // 완료한 퀴즈 세트 수
       stamps: [],       // 해금된 도장 ID 배열
+      avatar: {
+        owned: [...DEFAULT_AVATAR.owned],
+        equipped: { ...DEFAULT_AVATAR.equipped },
+      },
     };
   }
 
@@ -25,14 +40,26 @@ const Storage = (() => {
     try {
       const raw = JSON.parse(localStorage.getItem(KEY));
       if (!raw || typeof raw !== 'object') return base;
+      const stars = Number.isFinite(raw.stars) ? raw.stars : 0;
+      const totalStars = Number.isFinite(raw.totalStars) ? Math.max(raw.totalStars, stars) : stars;
+      const rawAvatar = raw.avatar && typeof raw.avatar === 'object' ? raw.avatar : {};
+      const owned = Array.isArray(rawAvatar.owned)
+        ? Array.from(new Set([...DEFAULT_AVATAR.owned, ...rawAvatar.owned]))
+        : [...DEFAULT_AVATAR.owned];
+      const equipped = {
+        ...DEFAULT_AVATAR.equipped,
+        ...(rawAvatar.equipped && typeof rawAvatar.equipped === 'object' ? rawAvatar.equipped : {}),
+      };
       return {
         kana:         raw.kana && typeof raw.kana === 'object' ? { ...raw.kana } : {},
         words:        raw.words && typeof raw.words === 'object' ? { ...raw.words } : {},
         bookmarks:    Array.isArray(raw.bookmarks) ? [...raw.bookmarks] : [],
-        stars:        Number.isFinite(raw.stars) ? raw.stars : 0,
+        stars,
+        totalStars,
         bestCombo:    Number.isFinite(raw.bestCombo) ? raw.bestCombo : 0,
         totalQuizzes: Number.isFinite(raw.totalQuizzes) ? raw.totalQuizzes : 0,
         stamps:       Array.isArray(raw.stamps) ? [...raw.stamps] : [],
+        avatar:       { owned, equipped },
       };
     } catch {
       return base;
@@ -70,7 +97,7 @@ const Storage = (() => {
     const totalWordAnswered = Object.values(state.words).reduce((s, e) => s + e.total, 0);
     if (totalWordAnswered >= 30) unlock('words_30');
     if (state.bookmarks.length >= 3) unlock('bookmark_3');
-    if (state.stars >= 50) unlock('all_star_50');
+    if (state.totalStars >= 50) unlock('all_star_50');
 
     state.stamps = Array.from(unlocked);
     return newlyUnlocked;
@@ -110,6 +137,7 @@ const Storage = (() => {
 
     const earnedStars = score * 2 + (total > 0 && score === total ? 5 : 0);
     state.stars += earnedStars;
+    state.totalStars += earnedStars;
     state.bestCombo = Math.max(state.bestCombo, maxStreak);
     state.totalQuizzes += 1;
 
@@ -132,7 +160,7 @@ const Storage = (() => {
 
   /** 현재 별 개수 기준 레벨 및 다음 레벨 진행 정보 계산 */
   function getLevelInfo(starsInput) {
-    const stars = typeof starsInput === 'number' ? starsInput : load().stars;
+    const stars = typeof starsInput === 'number' ? starsInput : load().totalStars;
     const titles = typeof LEVEL_TITLES !== 'undefined' ? LEVEL_TITLES : [
       { level: 1, minStars: 0, title: '도전자', badge: '⚡' },
     ];
@@ -174,10 +202,54 @@ const Storage = (() => {
       wordsRate:     calcRate(state.words),
       bookmarkCount: state.bookmarks.length,
       stars:         state.stars,
+      totalStars:    state.totalStars,
       bestCombo:     state.bestCombo,
       stampCount:    state.stamps.length,
-      levelInfo:     getLevelInfo(state.stars),
+      levelInfo:     getLevelInfo(state.totalStars),
     };
+  }
+
+  /** 아바타 아이템 구매 (별 소비 + 자동 착용) */
+  function buyAvatarItem(itemId) {
+    const items = typeof AVATAR_ITEMS !== 'undefined' ? AVATAR_ITEMS : [];
+    const item = items.find(i => i.id === itemId);
+    if (!item) return { ok: false, reason: 'not_found' };
+
+    const state = load();
+    if (state.avatar.owned.includes(itemId)) {
+      state.avatar.equipped[item.category] = itemId;
+      save(state);
+      return { ok: true, alreadyOwned: true, state, item };
+    }
+    if (state.stars < item.price) {
+      return { ok: false, reason: 'insufficient_stars', needed: item.price - state.stars, state };
+    }
+
+    state.stars -= item.price;
+    state.avatar.owned.push(itemId);
+    state.avatar.equipped[item.category] = itemId;
+    save(state);
+    return { ok: true, state, item };
+  }
+
+  /** 보유 중인 아바타 아이템 착용 */
+  function equipAvatarItem(itemId) {
+    const items = typeof AVATAR_ITEMS !== 'undefined' ? AVATAR_ITEMS : [];
+    const item = items.find(i => i.id === itemId);
+    if (!item) return { ok: false, reason: 'not_found' };
+
+    const state = load();
+    if (!state.avatar.owned.includes(itemId)) {
+      return { ok: false, reason: 'not_owned', state };
+    }
+    state.avatar.equipped[item.category] = itemId;
+    save(state);
+    return { ok: true, state, item };
+  }
+
+  /** 현재 착용 중인 아바타 장비 객체 반환 */
+  function getEquippedAvatar() {
+    return load().avatar.equipped;
   }
 
   function reset() {
@@ -192,6 +264,9 @@ const Storage = (() => {
     toggleBookmark,
     getLevelInfo,
     getSummary,
+    buyAvatarItem,
+    equipAvatarItem,
+    getEquippedAvatar,
     reset,
   };
 })();

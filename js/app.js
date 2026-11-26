@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Router.register('#kana-quiz',  KanaModule.renderQuiz);
   Router.register('#words',      WordsModule.renderSelectScreen);
   Router.register('#words-quiz', WordsModule.renderQuiz);
+  Router.register('#avatar',     AvatarModule.render);
   Router.register('#progress',   ProgressModule.render);
 
   // ── 네비게이션 & 별 배지 상태 동기화 ──────────────────────
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="hero-panel__burst">${AnimeSVG.speedLines()}</div>
           <div class="hero-panel__mascot">
             ${AnimeSVG.mascot('happy', 138)}
+            <a href="#avatar" class="btn btn--accent btn--sm" style="margin-top:8px">🎨 아바타 꾸미기</a>
           </div>
           <div class="hero-panel__body">
             <span class="hero-badge">LV.${levelInfo.level} ${levelInfo.badge} ${levelInfo.title}</span>
