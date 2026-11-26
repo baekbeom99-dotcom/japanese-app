@@ -177,24 +177,29 @@ const AvatarModule = (() => {
   };
 
   /**
-   * 퀴즈 배틀 아레나 HTML 생성 (착용 아바타 시바견 + 장착 표창 + 변화하는 표적)
+   * 퀴즈 배틀 바 HTML 생성 (시바견 아바타 + 말풍선 + 표창 궤적 + 변화하는 표적)
    * @param {number} stepSeed
+   * @param {'idle'|'happy'|'encourage'} [mood='idle']
+   * @param {string} [mascotMsg='']
    */
-  function renderQuizArena(stepSeed = 0) {
+  function renderQuizArena(stepSeed = 0, mood = 'idle', mascotMsg = '') {
     const equipped = Storage.getEquippedAvatar();
     const targetKind = QUIZ_TARGETS[Math.abs(stepSeed) % QUIZ_TARGETS.length];
     return `
       <div class="quiz-arena" id="quiz-arena" data-target-kind="${targetKind}">
         <div class="quiz-arena__ninja" id="arena-ninja">
-          ${AnimeSVG.mascot('idle', 88, { equipped, pose: 'idle' })}
+          ${AnimeSVG.mascot(mood, 84, { equipped, pose: 'idle' })}
         </div>
-        <div class="quiz-arena__lane">
-          <div class="quiz-arena__shuriken" id="arena-shuriken" aria-hidden="true">
-            ${AnimeSVG.shurikenItem(equipped.shuriken, 40)}
+        <div class="quiz-arena__center">
+          <div class="speech-bubble" id="quiz-mascot-msg">${mascotMsg}</div>
+          <div class="quiz-arena__lane">
+            <div class="quiz-arena__shuriken" id="arena-shuriken" aria-hidden="true">
+              ${AnimeSVG.shurikenItem(equipped.shuriken, 38)}
+            </div>
           </div>
         </div>
         <div class="quiz-arena__target" id="arena-target">
-          ${AnimeSVG.quizTarget(targetKind, 'idle', 84)}
+          ${AnimeSVG.quizTarget(targetKind, 'idle', 82)}
         </div>
       </div>
     `;

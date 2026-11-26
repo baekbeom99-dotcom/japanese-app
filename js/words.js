@@ -364,16 +364,12 @@ const WordsModule = (() => {
           </div>
         </div>
 
-        <div class="mascot-row">
-          ${AnimeSVG.mascot(q.streak >= 3 ? 'happy' : 'idle', 76)}
-          <div class="speech-bubble" id="quiz-mascot-msg">${mascotMsg}</div>
-        </div>
+        ${AvatarModule.renderQuizArena(_quizRound * 17 + idx, q.streak >= 3 ? 'happy' : 'idle', mascotMsg)}
 
         <div class="quiz-stage" id="quiz-stage">
           <div class="stage-motif-overlay" aria-hidden="true">${AnimeSVG.quizStageBackdrop(_quizRound * 17 + idx)}</div>
           <div class="sakura-shadow-overlay" id="sakura-shadow-overlay" aria-hidden="true">${AnimeSVG.sakuraStageShadow(_quizRound * 17 + idx)}</div>
           <div class="speed-lines-overlay">${AnimeSVG.speedLines()}</div>
-          ${AvatarModule.renderQuizArena(_quizRound * 17 + idx)}
           ${q.isRetry ? '<span class="pill-badge pill-badge--gold" style="position:relative;z-index:2">🔁 다시 도전 문제!</span>' : ''}
           <div class="quiz-question meaning-huge">${q.question}</div>
           <div class="quiz-hint-area">
