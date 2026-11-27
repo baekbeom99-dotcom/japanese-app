@@ -188,20 +188,20 @@ const AnimeSVG = (() => {
   }
 
   /**
-   * 시바견 닌자 마스코트 "킨타" Parametric SVG (아바타 장비 + 포즈 지원)
+   * 시바견 닌자 마스코트 "킨타" Parametric SVG (레퍼런스 기반 실감나는 도복 + 아바타 장비 + 포즈)
    * @param {'idle'|'happy'|'encourage'} [mood='idle']
    * @param {number} [size=132]
    * @param {{ equipped?:Object, pose?:string, flipX?:boolean }} [options={}]
    */
   function mascot(mood = 'idle', size = 132, options = {}) {
-    const W = 180;
-    const H = 180;
-    const cx = W / 2;
-    const cy = 78;
-    const headR = 42;
+    const W = 200;
+    const H = 200;
+    const cx = 92;
+    const cy = 74;
     const ink = 'var(--color-ink, #1E1B2E)';
-    const furMain = '#F59E0B';
-    const furLight = '#FEF3C7';
+    const furMain = '#EA7317';
+    const furTop = '#FB923C';
+    const furLight = '#FFF7ED';
 
     const eq = _resolveAvatar(options.equipped);
     const pose = options.pose || 'idle';
@@ -210,167 +210,224 @@ const AnimeSVG = (() => {
     const titleId = _nextId('mascot-title');
     const bgGradId = _nextId('mascot-bg');
     const furGradId = _nextId('mascot-fur');
+    const giGradId = _nextId('mascot-gi');
 
-    const earOuterOffset = 31;
-    const earTopY = 16;
-    const earBaseY = 52;
-    const leftEar = `${cx - earOuterOffset - 11},${earBaseY} ${cx - earOuterOffset + 4},${earTopY} ${cx - 11},${earBaseY - 11}`;
-    const rightEar = `${cx + earOuterOffset + 11},${earBaseY} ${cx + earOuterOffset - 4},${earTopY} ${cx + 11},${earBaseY - 11}`;
+    // 귀 (시바견 특유 삼각 귀 + 안쪽 살구색)
+    const leftEar = `${cx - 38},54 ${cx - 30},16 ${cx - 10},40`;
+    const rightEar = `${cx + 38},54 ${cx + 30},16 ${cx + 10},40`;
+    const leftEarIn = `${cx - 32},50 ${cx - 28},25 ${cx - 15},41`;
+    const rightEarIn = `${cx + 32},50 ${cx + 28},25 ${cx + 15},41`;
 
-    const scarfCurve = smoothSplinePath([
-      { x: cx + 30, y: 112 },
-      { x: cx + 48, y: 104 },
-      { x: cx + 62, y: 112 },
-    ], 0.3, false);
+    // 말린 시바견 꼬리 (우측 엉덩이 뒤)
+    const tailOuter = smoothSplinePath([
+      { x: cx + 26, y: 152 },
+      { x: cx + 50, y: 146 },
+      { x: cx + 56, y: 126 },
+      { x: cx + 40, y: 118 },
+      { x: cx + 32, y: 132 },
+    ], 0.35, false);
 
-    // 눈/입 표정 계산
-    const eyeY = cy - 4;
+    // 펄럭이는 두 가닥 헤어밴드 리본 (우측으로 휘날림)
+    const ribbonTop = `M ${cx + 36} ${cy - 26} Q ${cx + 66} ${cy - 30} ${cx + 88} ${cy - 48} Q ${cx + 84} ${cy - 36} ${cx + 78} ${cy - 32} Q ${cx + 58} ${cy - 20} ${cx + 36} ${cy - 19} Z`;
+    const ribbonBot = `M ${cx + 36} ${cy - 20} Q ${cx + 68} ${cy - 22} ${cx + 94} ${cy - 16} Q ${cx + 86} ${cy - 10} ${cx + 78} ${cy - 7} Q ${cx + 56} ${cy - 12} ${cx + 35} ${cy - 15} Z`;
+
+    // 눈/입/눈썹 표정
+    const eyeY = cy + 2;
     const eyeDX = 16;
     let eyesMarkup = '';
     let mouthMarkup = '';
 
     if (mood === 'happy') {
-      const leftArc = smoothSplinePath([
-        { x: cx - eyeDX - 6, y: eyeY + 2 },
-        { x: cx - eyeDX, y: eyeY - 5 },
-        { x: cx - eyeDX + 6, y: eyeY + 2 },
-      ], 0.35, false);
-      const rightArc = smoothSplinePath([
-        { x: cx + eyeDX - 6, y: eyeY + 2 },
-        { x: cx + eyeDX, y: eyeY - 5 },
-        { x: cx + eyeDX + 6, y: eyeY + 2 },
-      ], 0.35, false);
       eyesMarkup = `
-        <path d="${leftArc}" fill="none" stroke="${ink}" stroke-width="3.8" stroke-linecap="round"/>
-        <path d="${rightArc}" fill="none" stroke="${ink}" stroke-width="3.8" stroke-linecap="round"/>
+        <circle cx="${cx - eyeDX}" cy="${eyeY}" r="6.4" fill="${ink}"/>
+        <circle cx="${cx - eyeDX - 2}" cy="${eyeY - 2.2}" r="2.3" fill="#FFFFFF"/>
+        <circle cx="${cx - eyeDX + 2}" cy="${eyeY + 2}" r="1.1" fill="#FFFFFF"/>
+        <circle cx="${cx + eyeDX}" cy="${eyeY}" r="6.4" fill="${ink}"/>
+        <circle cx="${cx + eyeDX - 2}" cy="${eyeY - 2.2}" r="2.3" fill="#FFFFFF"/>
+        <circle cx="${cx + eyeDX + 2}" cy="${eyeY + 2}" r="1.1" fill="#FFFFFF"/>
       `;
       mouthMarkup = `
-        <path d="M ${cx - 9} ${cy + 14} Q ${cx} ${cy + 27} ${cx + 9} ${cy + 14} Z" fill="#FB7185" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+        <path d="M ${cx - 8} ${cy + 15} Q ${cx - 4} ${cy + 20} ${cx} ${cy + 15} Q ${cx + 4} ${cy + 20} ${cx + 8} ${cy + 15}" fill="none" stroke="${ink}" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M ${cx - 6.5} ${cy + 17} Q ${cx} ${cy + 29} ${cx + 6.5} ${cy + 17} Z" fill="#FB7185" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
       `;
     } else if (mood === 'encourage') {
       eyesMarkup = `
-        <line x1="${cx - eyeDX - 5}" y1="${eyeY - 4}" x2="${cx - eyeDX + 5}" y2="${eyeY + 3}" stroke="${ink}" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="${cx - eyeDX - 5}" y1="${eyeY + 4}" x2="${cx - eyeDX + 5}" y2="${eyeY - 2}" stroke="${ink}" stroke-width="3.5" stroke-linecap="round"/>
-        <circle cx="${cx + eyeDX}" cy="${eyeY}" r="5.2" fill="${ink}"/>
-        <circle cx="${cx + eyeDX + 1.6}" cy="${eyeY - 1.6}" r="1.9" fill="#FFFFFF"/>
+        <line x1="${cx - eyeDX - 5}" y1="${eyeY - 4}" x2="${cx - eyeDX + 5}" y2="${eyeY + 3}" stroke="${ink}" stroke-width="3.4" stroke-linecap="round"/>
+        <line x1="${cx - eyeDX - 5}" y1="${eyeY + 4}" x2="${cx - eyeDX + 5}" y2="${eyeY - 2}" stroke="${ink}" stroke-width="3.4" stroke-linecap="round"/>
+        <circle cx="${cx + eyeDX}" cy="${eyeY}" r="5.6" fill="${ink}"/>
+        <circle cx="${cx + eyeDX + 1.8}" cy="${eyeY - 1.8}" r="2" fill="#FFFFFF"/>
       `;
       mouthMarkup = `
-        <path d="${smoothSplinePath([
-          { x: cx - 8, y: cy + 17 },
-          { x: cx - 3, y: cy + 14 },
-          { x: cx + 3, y: cy + 18 },
-          { x: cx + 8, y: cy + 15 },
-        ], 0.3, false)}" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>
+        <path d="M ${cx - 8} ${cy + 18} Q ${cx} ${cy + 14} ${cx + 8} ${cy + 18}" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
       `;
     } else {
       eyesMarkup = `
-        <circle cx="${cx - eyeDX}" cy="${eyeY}" r="5.4" fill="${ink}"/>
-        <circle cx="${cx - eyeDX - 1.6}" cy="${eyeY - 1.8}" r="2" fill="#FFFFFF"/>
-        <circle cx="${cx + eyeDX}" cy="${eyeY}" r="5.4" fill="${ink}"/>
-        <circle cx="${cx + eyeDX - 1.6}" cy="${eyeY - 1.8}" r="2" fill="#FFFFFF"/>
+        <circle cx="${cx - eyeDX}" cy="${eyeY}" r="5.8" fill="${ink}"/>
+        <circle cx="${cx - eyeDX - 1.8}" cy="${eyeY - 2}" r="2.1" fill="#FFFFFF"/>
+        <circle cx="${cx - eyeDX + 1.8}" cy="${eyeY + 1.8}" r="1" fill="#FFFFFF"/>
+        <circle cx="${cx + eyeDX}" cy="${eyeY}" r="5.8" fill="${ink}"/>
+        <circle cx="${cx + eyeDX - 1.8}" cy="${eyeY - 2}" r="2.1" fill="#FFFFFF"/>
+        <circle cx="${cx + eyeDX + 1.8}" cy="${eyeY + 1.8}" r="1" fill="#FFFFFF"/>
       `;
       mouthMarkup = `
-        <path d="M ${cx - 7} ${cy + 14} Q ${cx - 3.5} ${cy + 20} ${cx} ${cy + 14} Q ${cx + 3.5} ${cy + 20} ${cx + 7} ${cy + 14}" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M ${cx - 7} ${cy + 15} Q ${cx - 3.5} ${cy + 21} ${cx} ${cy + 15} Q ${cx + 3.5} ${cy + 21} ${cx + 7} ${cy + 15}" fill="none" stroke="${ink}" stroke-width="2.6" stroke-linecap="round"/>
       `;
     }
 
-    // 헤어밴드 문양 & 상단 장식
+    // 헤어밴드 문양/장식
     let emblemMarkup = '';
     if (eq.headband.emblem === 'bolt') {
-      emblemMarkup = `<polygon points="${cx + 2},${cy - 34} ${cx - 4},${cy - 26} ${cx + 1},${cy - 26} ${cx - 2},${cy - 18} ${cx + 5},${cy - 27} ${cx},${cy - 27}" fill="#FACC15" stroke="${ink}" stroke-width="1.4" stroke-linejoin="round"/>`;
+      emblemMarkup = `<polygon points="${cx + 2},${cy - 31} ${cx - 4},${cy - 23} ${cx + 1},${cy - 23} ${cx - 2},${cy - 15} ${cx + 5},${cy - 24} ${cx},${cy - 24}" fill="#FACC15" stroke="${ink}" stroke-width="1.4" stroke-linejoin="round"/>`;
     } else if (eq.headband.emblem === 'sakura') {
-      emblemMarkup = `<path d="${_sakuraBlossomPaths(cx, cy - 26, 7.5, 0)}" fill="#FBCFE8" stroke="#BE123C" stroke-width="1.2"/>`;
+      emblemMarkup = `<path d="${_sakuraBlossomPaths(cx, cy - 23, 7, 0)}" fill="#FBCFE8" stroke="#BE123C" stroke-width="1.2"/>`;
     } else if (eq.headband.emblem === 'horns') {
       emblemMarkup = `
-        <polygon points="${cx - 22},${cy - 33} ${cx - 32},${cy - 54} ${cx - 12},${cy - 36}" fill="#FACC15" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
-        <polygon points="${cx + 22},${cy - 33} ${cx + 32},${cy - 54} ${cx + 12},${cy - 36}" fill="#FACC15" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
-        <polygon points="${createStarPoints(cx, cy - 26, 4, 7, 3, 0)}" fill="#F97316" stroke="${ink}" stroke-width="1.5"/>
+        <polygon points="${cx - 20},${cy - 30} ${cx - 30},${cy - 50} ${cx - 10},${cy - 33}" fill="#FACC15" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
+        <polygon points="${cx + 20},${cy - 30} ${cx + 30},${cy - 50} ${cx + 10},${cy - 33}" fill="#FACC15" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
       `;
     } else if (eq.headband.emblem === 'crown') {
       emblemMarkup = `
-        <polygon points="${cx - 20},${cy - 35} ${cx - 22},${cy - 54} ${cx - 9},${cy - 44} ${cx},${cy - 58} ${cx + 9},${cy - 44} ${cx + 22},${cy - 54} ${cx + 20},${cy - 35}" fill="#FACC15" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
-        <circle cx="${cx}" cy="${cy - 26}" r="4.5" fill="#E11D48" stroke="${ink}" stroke-width="1.5"/>
+        <polygon points="${cx - 18},${cy - 32} ${cx - 20},${cy - 50} ${cx - 8},${cy - 41} ${cx},${cy - 54} ${cx + 8},${cy - 41} ${cx + 20},${cy - 50} ${cx + 18},${cy - 32}" fill="#FACC15" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>
       `;
-    } else {
-      emblemMarkup = `<polygon points="${createStarPoints(cx, cy - 26, 5, 7.5, 3.4, 0)}" fill="#FACC15" stroke="${ink}" stroke-width="1.6" stroke-linejoin="round"/>`;
+    } else if (eq.headband.id !== 'headband_basic') {
+      emblemMarkup = `<polygon points="${createStarPoints(cx, cy - 23, 5, 6.8, 3, 0)}" fill="#FACC15" stroke="${ink}" stroke-width="1.5" stroke-linejoin="round"/>`;
     }
 
-    // 포즈별 몸/팔/이펙트 변환
+    // 포즈별 변환 & 팔/무기 배치
     let bodyTransform = '';
-    let weaponAngle = -24;
-    let weaponX = cx + 44;
-    let weaponY = 126;
+    let weaponAngle = -44;
+    let weaponX = cx - 44;
+    let weaponY = 122;
     let poseFx = '';
+    let rightArmRaised = true;
 
     if (pose === 'slash') {
-      bodyTransform = 'rotate(8 90 120)';
-      weaponAngle = 38;
-      weaponX = cx + 52;
+      bodyTransform = 'rotate(8 92 126)';
+      weaponAngle = 32;
+      weaponX = cx + 48;
       weaponY = 114;
-      poseFx = `<path d="M 122 68 Q 160 100 132 146" fill="none" stroke="#FACC15" stroke-width="5" stroke-linecap="round" opacity="0.85"/>`;
+      poseFx = `<path d="M 124 62 Q 174 96 138 158" fill="none" stroke="#FACC15" stroke-width="5.5" stroke-linecap="round" opacity="0.88"/>`;
     } else if (pose === 'kick') {
-      bodyTransform = 'rotate(-10 90 120)';
-      weaponAngle = -45;
-      poseFx = `<polygon points="${createStarPoints(148, 128, 6, 13, 5, 12)}" fill="#FACC15" stroke="${ink}" stroke-width="2"/>`;
+      bodyTransform = 'rotate(-10 92 126)';
+      weaponAngle = -52;
+      poseFx = `<polygon points="${createStarPoints(162, 134, 6, 13, 5, 12)}" fill="#FACC15" stroke="${ink}" stroke-width="2"/>`;
     } else if (pose === 'jump') {
       bodyTransform = 'translate(0, -10)';
-      weaponAngle = -60;
-      poseFx = `<line x1="60" y1="166" x2="120" y2="166" stroke="${ink}" stroke-width="3" stroke-dasharray="8 6" opacity="0.5"/>`;
+      weaponAngle = -65;
+      poseFx = `<line x1="54" y1="186" x2="132" y2="186" stroke="${ink}" stroke-width="3" stroke-dasharray="8 6" opacity="0.5"/>`;
     } else if (pose === 'throw') {
-      bodyTransform = 'rotate(6 90 120)';
-      weaponAngle = -55;
-      weaponX = cx - 42;
+      bodyTransform = 'rotate(9 92 126)';
+      weaponAngle = -68;
+      weaponX = cx - 46;
       weaponY = 128;
+      rightArmRaised = false;
+      poseFx = `
+        <line x1="138" y1="108" x2="178" y2="104" stroke="#FACC15" stroke-width="4" stroke-linecap="round"/>
+        <line x1="142" y1="120" x2="174" y2="118" stroke="#E11D48" stroke-width="3" stroke-linecap="round"/>
+      `;
     } else if (pose === 'meditate') {
       bodyTransform = 'translate(0, -4)';
       weaponAngle = 0;
-      weaponX = cx + 46;
+      weaponX = cx + 48;
       weaponY = 136;
-      poseFx = `<circle cx="${cx}" cy="${cy - 4}" r="74" fill="none" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="4 6" opacity="0.65"/>`;
+      rightArmRaised = false;
+      poseFx = `<circle cx="${cx}" cy="${cy + 14}" r="80" fill="none" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="4 6" opacity="0.65"/>`;
     } else if (pose === 'poof') {
       poseFx = `
-        <circle cx="34" cy="142" r="14" fill="#FFFFFF" stroke="${ink}" stroke-width="2.4" opacity="0.9"/>
-        <circle cx="48" cy="148" r="10" fill="#FFFFFF" stroke="${ink}" stroke-width="2.4" opacity="0.9"/>
-        <circle cx="144" cy="144" r="12" fill="#FFFFFF" stroke="${ink}" stroke-width="2.4" opacity="0.9"/>
+        <circle cx="34" cy="154" r="14" fill="#FFFFFF" stroke="${ink}" stroke-width="2.4" opacity="0.92"/>
+        <circle cx="48" cy="160" r="10" fill="#FFFFFF" stroke="${ink}" stroke-width="2.4" opacity="0.92"/>
+        <circle cx="152" cy="156" r="12" fill="#FFFFFF" stroke="${ink}" stroke-width="2.4" opacity="0.92"/>
       `;
     }
 
+    const beltColor = eq.headband.color || eq.outfit.trim;
+    const wrapColor = '#334155';
+
     const bodyMarkup = `
       <g id="mascot-pose-layer" transform="${bodyTransform}">
+        <!-- 말린 꼬리 -->
+        <g id="mascot-tail">
+          <path d="${tailOuter}" fill="none" stroke="${furMain}" stroke-width="14" stroke-linecap="round"/>
+          <path d="${tailOuter}" fill="none" stroke="${ink}" stroke-width="3.2" stroke-linecap="round"/>
+          <circle cx="${cx + 42}" cy="120" r="6" fill="${furLight}"/>
+        </g>
+
+        <!-- 닌자 바지 & 각반 & 발 -->
+        <g id="mascot-legs">
+          <path d="M ${cx - 28} 152 L ${cx - 32} 170 L ${cx - 12} 170 L ${cx - 8} 152 Z" fill="${eq.outfit.primary}" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+          <line x1="${cx - 30}" y1="160" x2="${cx - 12}" y2="167" stroke="${ink}" stroke-width="1.8"/>
+          <line x1="${cx - 12}" y1="160" x2="${cx - 30}" y2="167" stroke="${ink}" stroke-width="1.8"/>
+          <ellipse cx="${cx - 22}" cy="174" rx="9" ry="6" fill="${furMain}" stroke="${ink}" stroke-width="2.6"/>
+          <path d="M ${cx + 8} 152 L ${cx + 12} 175 L ${cx + 32} 175 L ${cx + 28} 152 Z" fill="${eq.outfit.primary}" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+          <line x1="${cx + 12}" y1="162" x2="${cx + 30}" y2="170" stroke="${ink}" stroke-width="1.8"/>
+          <line x1="${cx + 30}" y1="162" x2="${cx + 12}" y2="170" stroke="${ink}" stroke-width="1.8"/>
+          <ellipse cx="${cx + 22}" cy="179" rx="10" ry="6.5" fill="${furMain}" stroke="${ink}" stroke-width="2.6"/>
+        </g>
+
+        <!-- 실감나는 닌자 도복 (겹침 옷깃 + 팔 토시 + 허리띠 매듭) -->
         <g id="mascot-outfit">
-          <path d="M ${cx - 34} 118 L ${cx + 34} 118 L ${cx + 42} 162 L ${cx - 42} 162 Z" fill="${eq.outfit.primary}" stroke="${ink}" stroke-width="3.2" stroke-linejoin="round"/>
-          <path d="M ${cx - 18} 118 L ${cx} 142 L ${cx + 18} 118" fill="none" stroke="${eq.outfit.trim}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-          <rect x="${cx - 36}" y="142" width="72" height="10" rx="4" fill="${eq.outfit.trim}" stroke="${ink}" stroke-width="2.5"/>
-          <ellipse cx="${cx - 34}" cy="134" rx="11" ry="8" fill="${furLight}" stroke="${ink}" stroke-width="2.8"/>
-          <ellipse cx="${cx + 34}" cy="134" rx="11" ry="8" fill="${furLight}" stroke="${ink}" stroke-width="2.8"/>
+          <path d="M ${cx - 30} 112 L ${cx - 50} 126 L ${cx - 40} 140 L ${cx - 24} 130 Z" fill="${eq.outfit.primary}" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+          <path d="M ${cx - 46} 124 L ${cx - 37} 136" stroke="${eq.outfit.trim}" stroke-width="2" opacity="0.8"/>
+          <line x1="${cx - 46}" y1="126" x2="${cx - 34}" y2="132" stroke="${ink}" stroke-width="1.8"/>
+          <circle cx="${cx - 47}" cy="126" r="8" fill="${furMain}" stroke="${ink}" stroke-width="2.6"/>
+
+          ${rightArmRaised ? `
+            <path d="M ${cx + 26} 116 L ${cx + 46} 96 L ${cx + 56} 106 L ${cx + 34} 130 Z" fill="${eq.outfit.primary}" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+            <line x1="${cx + 38}" y1="104" x2="${cx + 49}" y2="113" stroke="${ink}" stroke-width="1.8"/>
+            <line x1="${cx + 42}" y1="115" x2="${cx + 46}" y2="100" stroke="${ink}" stroke-width="1.8"/>
+            <circle cx="${cx + 52}" cy="98" r="8" fill="${furLight}" stroke="${ink}" stroke-width="2.6"/>
+          ` : `
+            <path d="M ${cx + 28} 114 L ${cx + 54} 116 L ${cx + 52} 130 L ${cx + 26} 128 Z" fill="${eq.outfit.primary}" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+            <circle cx="${cx + 56}" cy="122" r="8" fill="${furLight}" stroke="${ink}" stroke-width="2.6"/>
+          `}
+
+          <path d="M ${cx - 32} 108 L ${cx + 32} 108 L ${cx + 37} 154 L ${cx - 37} 154 Z" fill="url(#${giGradId})" stroke="${ink}" stroke-width="3.2" stroke-linejoin="round"/>
+          <path d="M ${cx + 16} 108 L ${cx - 10} 138 L ${cx - 2} 142 L ${cx + 22} 110 Z" fill="${wrapColor}" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round"/>
+          <path d="M ${cx - 20} 108 L ${cx + 14} 142 L ${cx + 20} 138 L ${cx - 12} 108 Z" fill="${eq.outfit.trim}" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round"/>
+          <line x1="${cx - 18}" y1="146" x2="${cx - 22}" y2="154" stroke="${ink}" stroke-width="1.8" opacity="0.45"/>
+          <line x1="${cx + 18}" y1="146" x2="${cx + 22}" y2="154" stroke="${ink}" stroke-width="1.8" opacity="0.45"/>
+
+          <path d="M ${cx - 35} 135 Q ${cx} 141 ${cx + 35} 135 L ${cx + 36} 144 Q ${cx} 150 ${cx - 36} 144 Z" fill="${beltColor}" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
+          <polygon points="${cx - 2},144 ${cx - 14},160 ${cx - 6},162 ${cx + 2},146" fill="${beltColor}" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round"/>
+          <polygon points="${cx + 2},144 ${cx + 15},160 ${cx + 7},162 ${cx - 2},146" fill="${beltColor}" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round"/>
+          <ellipse cx="${cx}" cy="142" rx="7" ry="5.5" fill="${beltColor}" stroke="${ink}" stroke-width="2.4"/>
         </g>
-        <g id="mascot-scarf">
-          <path d="${scarfCurve}" fill="none" stroke="${eq.headband.color}" stroke-width="9" stroke-linecap="round"/>
-          <path d="${scarfCurve}" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
-          <rect x="${cx - 28}" y="109" width="56" height="14" rx="7" fill="${eq.headband.color}" stroke="${ink}" stroke-width="3"/>
-        </g>
+
+        <!-- 귀 -->
         <g id="mascot-ears">
-          <polygon points="${leftEar}" fill="${furMain}" stroke="${ink}" stroke-width="3.4" stroke-linejoin="round"/>
-          <polygon points="${rightEar}" fill="${furMain}" stroke="${ink}" stroke-width="3.4" stroke-linejoin="round"/>
-          <polygon points="${cx - earOuterOffset - 3},${earBaseY - 4} ${cx - earOuterOffset + 4},${earTopY + 10} ${cx - 18},${earBaseY - 11}" fill="#FDA4AF"/>
-          <polygon points="${cx + earOuterOffset + 3},${earBaseY - 4} ${cx + earOuterOffset - 4},${earTopY + 10} ${cx + 18},${earBaseY - 11}" fill="#FDA4AF"/>
+          <polygon points="${leftEar}" fill="${furMain}" stroke="${ink}" stroke-width="3.2" stroke-linejoin="round"/>
+          <polygon points="${rightEar}" fill="${furMain}" stroke="${ink}" stroke-width="3.2" stroke-linejoin="round"/>
+          <polygon points="${leftEarIn}" fill="#FDBA74"/>
+          <polygon points="${rightEarIn}" fill="#FDBA74"/>
         </g>
+
+        <!-- 시바견 머리 + 우라지로 + 눈썹 점 -->
         <g id="mascot-head">
-          <ellipse cx="${cx}" cy="${cy}" rx="${headR}" ry="${headR - 4}" fill="url(#${furGradId})" stroke="${ink}" stroke-width="3.4"/>
-          <ellipse cx="${cx}" cy="${cy + 13}" rx="31" ry="22" fill="${furLight}"/>
-          <ellipse cx="${cx - 23}" cy="${cy + 7}" rx="6.5" ry="3.8" fill="#FB7185" opacity="0.65"/>
-          <ellipse cx="${cx + 23}" cy="${cy + 7}" rx="6.5" ry="3.8" fill="#FB7185" opacity="0.65"/>
+          <path d="M ${cx - 43} ${cy + 4} C ${cx - 44} ${cy - 28}, ${cx - 26} ${cy - 36}, ${cx} ${cy - 36} C ${cx + 26} ${cy - 36}, ${cx + 44} ${cy - 28}, ${cx + 43} ${cy + 4} C ${cx + 44} ${cy + 26}, ${cx + 26} ${cy + 34}, ${cx} ${cy + 34} C ${cx - 26} ${cy + 34}, ${cx - 44} ${cy + 26}, ${cx - 43} ${cy + 4} Z" fill="url(#${furGradId})" stroke="${ink}" stroke-width="3.2" stroke-linejoin="round"/>
+          <path d="M ${cx - 40} ${cy + 8} Q ${cx - 22} ${cy + 2} ${cx - 8} ${cy + 8} Q ${cx} ${cy - 2} ${cx + 8} ${cy + 8} Q ${cx + 22} ${cy + 2} ${cx + 40} ${cy + 8} C ${cx + 38} ${cy + 26}, ${cx + 22} ${cy + 32}, ${cx} ${cy + 32} C ${cx - 22} ${cy + 32}, ${cx - 38} ${cy + 26}, ${cx - 40} ${cy + 8} Z" fill="${furLight}"/>
+          <ellipse cx="${cx - 14}" cy="${cy - 10}" rx="5" ry="2.8" fill="${furLight}" transform="rotate(-12 ${cx - 14} ${cy - 10})"/>
+          <ellipse cx="${cx + 14}" cy="${cy - 10}" rx="5" ry="2.8" fill="${furLight}" transform="rotate(12 ${cx + 14} ${cy - 10})"/>
         </g>
+
+        <!-- 흐르는 닌자 헤어밴드 + 리본 -->
         <g id="mascot-headband">
-          <path d="M ${cx - 40} ${cy - 20} Q ${cx} ${cy - 31} ${cx + 40} ${cy - 20} L ${cx + 41} ${cy - 31} Q ${cx} ${cy - 41} ${cx - 41} ${cy - 31} Z" fill="${eq.headband.color}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>
-          <rect x="${cx - 13}" y="${cy - 35}" width="26" height="18" rx="5" fill="#E2E8F0" stroke="${ink}" stroke-width="2.5"/>
+          <path d="${ribbonTop}" fill="${eq.headband.color}" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="${ribbonBot}" fill="${eq.headband.color}" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M ${cx - 39} ${cy - 18} Q ${cx} ${cy - 24} ${cx + 39} ${cy - 18} L ${cx + 40} ${cy - 28} Q ${cx} ${cy - 34} ${cx - 40} ${cy - 28} Z" fill="${eq.headband.color}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>
+          <line x1="${cx - 34}" y1="${cy - 23}" x2="${cx + 34}" y2="${cy - 23}" stroke="${ink}" stroke-width="1.3" opacity="0.35"/>
+          <circle cx="${cx + 38}" cy="${cy - 22}" r="4.5" fill="${eq.headband.color}" stroke="${ink}" stroke-width="2.4"/>
           ${emblemMarkup}
         </g>
+
+        <!-- 얼굴 표정 -->
         <g id="mascot-face">
           ${eyesMarkup}
-          <ellipse cx="${cx}" cy="${cy + 6}" rx="5" ry="3.6" fill="${ink}"/>
+          <ellipse cx="${cx}" cy="${cy + 9}" rx="5.2" ry="3.8" fill="${ink}"/>
+          <ellipse cx="${cx - 1.5}" cy="${cy + 7.8}" rx="1.6" ry="1" fill="#FFFFFF" opacity="0.7"/>
           ${mouthMarkup}
         </g>
+
+        <!-- 착용 무기 -->
         ${_weaponGroup(eq.weapon, weaponX, weaponY, weaponAngle)}
       </g>
     `;
@@ -385,17 +442,21 @@ const AnimeSVG = (() => {
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${size}" height="${size}" role="img" aria-labelledby="${titleId}" class="mascot-svg mascot-svg--${mood} mascot-pose--${pose}">
         <title id="${titleId}">${moodTitle}</title>
         <defs>
-          <radialGradient id="${bgGradId}" cx="50%" cy="45%" r="50%">
+          <radialGradient id="${bgGradId}" cx="50%" cy="48%" r="50%">
             <stop offset="0%" stop-color="#FEF08A"/>
-            <stop offset="100%" stop-color="#FDE047" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#FDE047" stop-opacity="0.16"/>
           </radialGradient>
           <linearGradient id="${furGradId}" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#FBBF24"/>
+            <stop offset="0%" stop-color="${furTop}"/>
             <stop offset="100%" stop-color="${furMain}"/>
+          </linearGradient>
+          <linearGradient id="${giGradId}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${eq.outfit.primary}"/>
+            <stop offset="100%" stop-color="${eq.outfit.primary}" stop-opacity="0.88"/>
           </linearGradient>
         </defs>
         <g id="mascot-backdrop">
-          <circle cx="${cx}" cy="${cy + 8}" r="72" fill="url(#${bgGradId})" stroke="${ink}" stroke-width="3" stroke-dasharray="6 4"/>
+          <circle cx="${cx}" cy="${cy + 20}" r="78" fill="url(#${bgGradId})" stroke="${ink}" stroke-width="2.6" stroke-dasharray="6 4"/>
         </g>
         <g id="mascot-root" ${flipX ? `transform="translate(${W}, 0) scale(-1, 1)"` : ''}>
           ${bodyMarkup}
@@ -406,83 +467,177 @@ const AnimeSVG = (() => {
   }
 
   /**
-   * 퀴즈 배틀 표적 Parametric SVG (짚 인형·과녁·사과·수박·달마)
-   * @param {'straw_doll'|'bullseye'|'apple'|'watermelon'|'daruma'} kind
+   * 퀴즈 배틀 표적 Parametric SVG (짚 인형·과녁·사과·수박·달마·분재화분·선인장)
+   * @param {'straw_doll'|'bullseye'|'apple'|'watermelon'|'daruma'|'bonsai'|'cactus'} kind
    * @param {'idle'|'hit'|'miss'} [state='idle']
    * @param {number} [size=86]
    */
   function quizTarget(kind = 'straw_doll', state = 'idle', size = 86) {
-    const W = 110;
-    const H = 110;
-    const cx = 55;
+    const W = 120;
+    const H = 120;
+    const cx = 60;
     const ink = 'var(--color-ink, #1E1B2E)';
     const titleId = _nextId('target-title');
+    const gradId = _nextId('target-grad');
+    let defsExtra = '';
     let body = '';
 
     if (kind === 'bullseye') {
       body = `
-        <line x1="34" y1="98" x2="48" y2="66" stroke="#92400E" stroke-width="6" stroke-linecap="round"/>
-        <line x1="76" y1="98" x2="62" y2="66" stroke="#92400E" stroke-width="6" stroke-linecap="round"/>
-        <circle cx="${cx}" cy="50" r="34" fill="#FFFFFF" stroke="${ink}" stroke-width="3"/>
-        <circle cx="${cx}" cy="50" r="24" fill="#E11D48" stroke="${ink}" stroke-width="2.5"/>
-        <circle cx="${cx}" cy="50" r="14" fill="#FFFFFF" stroke="${ink}" stroke-width="2"/>
-        <circle cx="${cx}" cy="50" r="6" fill="#FACC15" stroke="${ink}" stroke-width="2"/>
+        <line x1="36" y1="108" x2="52" y2="70" stroke="#92400E" stroke-width="6.5" stroke-linecap="round"/>
+        <line x1="84" y1="108" x2="68" y2="70" stroke="#92400E" stroke-width="6.5" stroke-linecap="round"/>
+        <line x1="60" y1="106" x2="60" y2="76" stroke="#78350F" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="${cx}" cy="52" r="38" fill="#D97706" stroke="${ink}" stroke-width="3"/>
+        <circle cx="${cx}" cy="52" r="33" fill="#FFFFFF" stroke="${ink}" stroke-width="2.6"/>
+        <circle cx="${cx}" cy="52" r="24" fill="#E11D48" stroke="${ink}" stroke-width="2.4"/>
+        <circle cx="${cx}" cy="52" r="14" fill="#FFFFFF" stroke="${ink}" stroke-width="2"/>
+        <circle cx="${cx}" cy="52" r="6" fill="#FACC15" stroke="${ink}" stroke-width="2"/>
       `;
     } else if (kind === 'apple') {
-      body = `
-        <rect x="26" y="84" width="58" height="12" rx="4" fill="#B45309" stroke="${ink}" stroke-width="2.8"/>
-        <path d="M 55 24 Q 68 12 72 22 Q 62 28 55 24 Z" fill="#10B981" stroke="${ink}" stroke-width="2.2"/>
-        <line x1="55" y1="24" x2="55" y2="33" stroke="#78350F" stroke-width="4" stroke-linecap="round"/>
-        <path d="M 55 34 C 34 26, 22 46, 28 66 C 32 82, 46 86, 55 82 C 64 86, 78 82, 82 66 C 88 46, 76 26, 55 34 Z" fill="#EF4444" stroke="${ink}" stroke-width="3"/>
-        <ellipse cx="42" cy="48" rx="5" ry="9" fill="#FCA5A5" opacity="0.6" transform="rotate(-18 42 48)"/>
+      defsExtra = `
+        <radialGradient id="${gradId}" cx="38%" cy="32%" r="65%">
+          <stop offset="0%" stop-color="#FCA5A5"/>
+          <stop offset="45%" stop-color="#EF4444"/>
+          <stop offset="100%" stop-color="#B91C1C"/>
+        </radialGradient>
       `;
+      if (state === 'hit') {
+        body = `
+          <rect x="24" y="94" width="72" height="12" rx="4" fill="#B45309" stroke="${ink}" stroke-width="2.8"/>
+          <path d="M 52 44 C 34 38, 22 56, 28 74 C 32 88, 44 92, 54 88 Z" fill="url(#${gradId})" stroke="${ink}" stroke-width="2.8" transform="rotate(-14 42 68)"/>
+          <path d="M 68 44 C 86 38, 98 56, 92 74 C 88 88, 76 92, 66 88 Z" fill="#FEF3C7" stroke="${ink}" stroke-width="2.8" transform="rotate(14 78 68)"/>
+          <circle cx="74" cy="68" r="2" fill="#78350F"/>
+          <circle cx="80" cy="72" r="2" fill="#78350F"/>
+          <circle cx="58" cy="30" r="4" fill="#EF4444"/>
+          <circle cx="72" cy="34" r="3" fill="#FCA5A5"/>
+        `;
+      } else {
+        body = `
+          <rect x="26" y="94" width="68" height="12" rx="4" fill="#B45309" stroke="${ink}" stroke-width="2.8"/>
+          <line x1="34" y1="100" x2="86" y2="100" stroke="#78350F" stroke-width="1.6"/>
+          <path d="M 60 28 Q 74 14 79 25 Q 68 32 60 28 Z" fill="#10B981" stroke="${ink}" stroke-width="2.4"/>
+          <line x1="60" y1="28" x2="60" y2="38" stroke="#78350F" stroke-width="4.2" stroke-linecap="round"/>
+          <path d="M 60 39 C 37 30, 24 52, 30 74 C 35 90, 50 95, 60 90 C 70 95, 85 90, 90 74 C 96 52, 83 30, 60 39 Z" fill="url(#${gradId})" stroke="${ink}" stroke-width="3"/>
+          <ellipse cx="45" cy="54" rx="5.5" ry="10" fill="#FFFFFF" opacity="0.45" transform="rotate(-18 45 54)"/>
+        `;
+      }
     } else if (kind === 'watermelon') {
-      body = `
-        <rect x="26" y="84" width="58" height="12" rx="4" fill="#B45309" stroke="${ink}" stroke-width="2.8"/>
-        <circle cx="${cx}" cy="54" r="31" fill="#16A34A" stroke="${ink}" stroke-width="3"/>
-        <path d="M 41 26 Q 48 54 41 82" fill="none" stroke="#14532D" stroke-width="4" stroke-linecap="round"/>
-        <path d="M 55 23 L 55 85" fill="none" stroke="#14532D" stroke-width="4" stroke-linecap="round"/>
-        <path d="M 69 26 Q 62 54 69 82" fill="none" stroke="#14532D" stroke-width="4" stroke-linecap="round"/>
-      `;
+      if (state === 'hit') {
+        body = `
+          <rect x="24" y="94" width="72" height="12" rx="4" fill="#B45309" stroke="${ink}" stroke-width="2.8"/>
+          <path d="M 24 68 A 36 36 0 0 0 96 68 Z" fill="#16A34A" stroke="${ink}" stroke-width="3"/>
+          <path d="M 30 68 A 30 30 0 0 0 90 68 Z" fill="#FB7185" stroke="${ink}" stroke-width="2"/>
+          <circle cx="48" cy="76" r="2.2" fill="${ink}"/>
+          <circle cx="60" cy="82" r="2.2" fill="${ink}"/>
+          <circle cx="72" cy="75" r="2.2" fill="${ink}"/>
+          <circle cx="54" cy="40" r="4" fill="#FB7185"/>
+          <circle cx="68" cy="44" r="3" fill="#F43F5E"/>
+        `;
+      } else {
+        body = `
+          <rect x="26" y="94" width="68" height="12" rx="4" fill="#B45309" stroke="${ink}" stroke-width="2.8"/>
+          <path d="M 60 28 Q 66 16 74 20" fill="none" stroke="#15803D" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="${cx}" cy="60" r="33" fill="#22C55E" stroke="${ink}" stroke-width="3"/>
+          <path d="M 44 31 Q 52 60 44 89" fill="none" stroke="#14532D" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M 60 27 L 60 93" fill="none" stroke="#14532D" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M 76 31 Q 68 60 76 89" fill="none" stroke="#14532D" stroke-width="4.5" stroke-linecap="round"/>
+          <ellipse cx="46" cy="44" rx="5" ry="9" fill="#FFFFFF" opacity="0.35" transform="rotate(-24 46 44)"/>
+        `;
+      }
     } else if (kind === 'daruma') {
       body = `
-        <ellipse cx="${cx}" cy="58" rx="34" ry="36" fill="#E11D48" stroke="${ink}" stroke-width="3.2"/>
-        <ellipse cx="${cx}" cy="46" rx="22" ry="15" fill="#FEF3C7" stroke="${ink}" stroke-width="2.4"/>
-        <circle cx="46" cy="46" r="4.5" fill="${ink}"/>
-        <circle cx="64" cy="46" r="4.5" fill="${ink}"/>
-        <path d="M 44 55 Q 55 51 66 55" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
-        <path d="M 38 72 Q 55 80 72 72" fill="none" stroke="#FACC15" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="${cx}" cy="64" rx="36" ry="38" fill="#E11D48" stroke="${ink}" stroke-width="3.2"/>
+        <ellipse cx="${cx}" cy="49" rx="23" ry="15" fill="#FEF3C7" stroke="${ink}" stroke-width="2.4"/>
+        <path d="M 42 42 Q 49 38 55 43" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M 65 43 Q 71 38 78 42" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
+        <circle cx="49" cy="49" r="4.5" fill="${ink}"/>
+        <circle cx="71" cy="49" r="4.5" fill="${ink}"/>
+        <path d="M 48 58 Q 60 54 72 58" fill="none" stroke="${ink}" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M 38 78 Q 60 88 82 78" fill="none" stroke="#FACC15" stroke-width="5.5" stroke-linecap="round"/>
+        <text x="${cx}" y="82" text-anchor="middle" font-family="var(--font-ja)" font-size="14" font-weight="800" fill="#FACC15">勝</text>
+      `;
+    } else if (kind === 'bonsai') {
+      const trunk = smoothSplinePath([
+        { x: 56, y: 80 },
+        { x: 48, y: 62 },
+        { x: 68, y: 46 },
+        { x: 60, y: 30 },
+      ], 0.35, false);
+      body = `
+        <rect x="34" y="102" width="10" height="6" rx="2" fill="#1E3A8A" stroke="${ink}" stroke-width="2.2"/>
+        <rect x="76" y="102" width="10" height="6" rx="2" fill="#1E3A8A" stroke="${ink}" stroke-width="2.2"/>
+        <path d="M 28 80 L 92 80 L 86 102 L 34 102 Z" fill="#1D4ED8" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+        <rect x="24" y="75" width="72" height="8" rx="3" fill="#3B82F6" stroke="${ink}" stroke-width="2.6"/>
+        <ellipse cx="60" cy="76" rx="28" ry="3.5" fill="#78350F"/>
+        <path d="${trunk}" fill="none" stroke="#78350F" stroke-width="10" stroke-linecap="round"/>
+        <path d="${trunk}" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M 55 56 Q 38 50 32 42" fill="none" stroke="#78350F" stroke-width="6" stroke-linecap="round"/>
+        <ellipse cx="32" cy="40" rx="16" ry="10" fill="#15803D" stroke="${ink}" stroke-width="2.5"/>
+        <ellipse cx="86" cy="48" rx="15" ry="9" fill="#16A34A" stroke="${ink}" stroke-width="2.5"/>
+        <ellipse cx="60" cy="26" rx="22" ry="13" fill="#22C55E" stroke="${ink}" stroke-width="2.6"/>
+        <ellipse cx="56" cy="22" rx="10" ry="5" fill="#86EFAC" opacity="0.6"/>
+        ${state === 'hit' ? `
+          <ellipse cx="26" cy="22" rx="5" ry="2.5" fill="#22C55E" transform="rotate(-30 26 22)"/>
+          <ellipse cx="94" cy="26" rx="5" ry="2.5" fill="#16A34A" transform="rotate(35 94 26)"/>
+        ` : ''}
+      `;
+    } else if (kind === 'cactus') {
+      const needles = [
+        { x: 48, y: 40, dx: -6, dy: -2 }, { x: 48, y: 58, dx: -6, dy: 0 },
+        { x: 72, y: 40, dx: 6, dy: -2 },  { x: 72, y: 58, dx: 6, dy: 0 },
+        { x: 30, y: 48, dx: -5, dy: -3 }, { x: 90, y: 44, dx: 5, dy: -3 },
+      ].map(n => `<line x1="${n.x}" y1="${n.y}" x2="${n.x + n.dx}" y2="${n.y + n.dy}" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"/>`).join('');
+      const flower = _sakuraBlossomPaths(cx, 22, 9.5, 0);
+      body = `
+        <path d="M 34 80 L 86 80 L 80 108 L 40 108 Z" fill="#EA580C" stroke="${ink}" stroke-width="2.8" stroke-linejoin="round"/>
+        <rect x="30" y="73" width="60" height="9" rx="3" fill="#F97316" stroke="${ink}" stroke-width="2.6"/>
+        <path d="M 48 64 L 35 64 Q 27 64 27 54 L 27 46 A 6 6 0 0 1 39 46 L 39 54 L 48 54 Z" fill="#16A34A" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
+        <path d="M 72 60 L 85 60 Q 93 60 93 50 L 93 42 A 6 6 0 0 0 81 42 L 81 50 L 72 50 Z" fill="#16A34A" stroke="${ink}" stroke-width="2.6" stroke-linejoin="round"/>
+        <rect x="48" y="26" width="24" height="50" rx="12" fill="#22C55E" stroke="${ink}" stroke-width="2.8"/>
+        <line x1="55" y1="30" x2="55" y2="74" stroke="#15803D" stroke-width="2" stroke-linecap="round"/>
+        <line x1="65" y1="30" x2="65" y2="74" stroke="#15803D" stroke-width="2" stroke-linecap="round"/>
+        ${needles}
+        <path d="${flower}" fill="#FB7185" stroke="${ink}" stroke-width="1.8" ${state === 'hit' ? 'transform="translate(14, -10) rotate(25 60 22)"' : ''}/>
+        <circle cx="${cx}" cy="${state === 'hit' ? 12 : 22}" r="3" fill="#FACC15" ${state === 'hit' ? 'transform="translate(14, 0)"' : ''}/>
       `;
     } else {
-      // 짚으로 만든 인형 (straw_doll)
       body = `
-        <line x1="55" y1="84" x2="55" y2="102" stroke="#78350F" stroke-width="5" stroke-linecap="round"/>
-        <rect x="22" y="46" width="66" height="14" rx="7" fill="#FDE68A" stroke="${ink}" stroke-width="2.8"/>
-        <rect x="43" y="42" width="24" height="44" rx="10" fill="#FCD34D" stroke="${ink}" stroke-width="2.8"/>
-        <line x1="43" y1="58" x2="67" y2="58" stroke="#B45309" stroke-width="3.5"/>
-        <line x1="43" y1="68" x2="67" y2="68" stroke="#B45309" stroke-width="3.5"/>
-        <circle cx="${cx}" cy="28" r="16" fill="#FDE68A" stroke="${ink}" stroke-width="2.8"/>
-        <line x1="47" y1="24" x2="51" y2="28" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
-        <line x1="51" y1="24" x2="47" y2="28" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
-        <line x1="59" y1="24" x2="63" y2="28" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
-        <line x1="63" y1="24" x2="59" y2="28" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="60" y1="90" x2="60" y2="110" stroke="#78350F" stroke-width="6" stroke-linecap="round"/>
+        <line x1="48" y1="110" x2="72" y2="110" stroke="#78350F" stroke-width="5" stroke-linecap="round"/>
+        <rect x="20" y="48" width="80" height="15" rx="7" fill="#FDE68A" stroke="${ink}" stroke-width="2.8"/>
+        <line x1="25" y1="53" x2="16" y2="50" stroke="#B45309" stroke-width="2"/>
+        <line x1="25" y1="58" x2="16" y2="61" stroke="#B45309" stroke-width="2"/>
+        <line x1="95" y1="53" x2="104" y2="50" stroke="#B45309" stroke-width="2"/>
+        <line x1="95" y1="58" x2="104" y2="61" stroke="#B45309" stroke-width="2"/>
+        <rect x="47" y="44" width="26" height="48" rx="11" fill="#FCD34D" stroke="${ink}" stroke-width="2.8"/>
+        <line x1="54" y1="48" x2="54" y2="88" stroke="#D97706" stroke-width="1.6" stroke-dasharray="4 3"/>
+        <line x1="66" y1="48" x2="66" y2="88" stroke="#D97706" stroke-width="1.6" stroke-dasharray="4 3"/>
+        <line x1="47" y1="62" x2="73" y2="62" stroke="#92400E" stroke-width="4"/>
+        <line x1="47" y1="73" x2="73" y2="73" stroke="#92400E" stroke-width="4"/>
+        <path d="M 52 14 L 56 6 M 60 13 L 60 4 M 68 14 L 64 6" stroke="#B45309" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="${cx}" cy="30" r="17" fill="#FDE68A" stroke="${ink}" stroke-width="2.8"/>
+        <line x1="51" y1="26" x2="56" y2="31" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="56" y1="26" x2="51" y2="31" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="64" y1="26" x2="69" y2="31" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="69" y1="26" x2="64" y2="31" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M 55 38 Q 60 35 65 38" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>
       `;
     }
 
     let stateFx = '';
     if (state === 'hit') {
-      const burstPts = createStarPoints(cx, 50, 8, 22, 10, 15);
+      const burstPts = createStarPoints(cx, 54, 8, 25, 11, 15);
       stateFx = `
         <g id="target-hit-fx">
-          <polygon points="${burstPts}" fill="#FACC15" stroke="${ink}" stroke-width="2.2" opacity="0.92"/>
-          <text x="${cx}" y="55" text-anchor="middle" font-family="var(--font-display)" font-size="14" fill="#E11D48">명중!</text>
+          <polygon points="${burstPts}" fill="#FACC15" stroke="${ink}" stroke-width="2.4" opacity="0.95"/>
+          <text x="${cx}" y="59" text-anchor="middle" font-family="var(--font-display)" font-size="15" fill="#E11D48">명중!</text>
         </g>
       `;
     } else if (state === 'miss') {
       stateFx = `
         <g id="target-miss-fx">
-          <path d="M 88 22 Q 96 32 88 38 Q 80 32 88 22 Z" fill="#38BDF8" stroke="${ink}" stroke-width="2"/>
-          <text x="${cx}" y="102" text-anchor="middle" font-family="var(--font-display)" font-size="13" fill="#2563EB">휴~ 피했다!</text>
+          <path d="M 96 22 Q 105 32 96 38 Q 87 32 96 22 Z" fill="#38BDF8" stroke="${ink}" stroke-width="2"/>
+          <text x="${cx}" y="114" text-anchor="middle" font-family="var(--font-display)" font-size="13" fill="#2563EB">휴~ 피했다!</text>
         </g>
       `;
     }
@@ -490,7 +645,8 @@ const AnimeSVG = (() => {
     return `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${size}" height="${size}" role="img" aria-labelledby="${titleId}" class="target-svg target-svg--${state}">
         <title id="${titleId}">표적 (${kind})</title>
-        <g id="target-body" ${state === 'hit' ? 'transform="rotate(9 55 60)"' : ''}>${body}</g>
+        <defs>${defsExtra}</defs>
+        <g id="target-body" ${state === 'hit' ? 'transform="rotate(9 60 65)"' : ''}>${body}</g>
         ${stateFx}
       </svg>
     `.trim();
@@ -513,10 +669,12 @@ const AnimeSVG = (() => {
       return mascot('idle', size, { equipped: { headband: item.id, outfit: 'outfit_basic', weapon: 'weapon_stick', shuriken: 'shuriken_classic' } });
     }
     return `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="${size}" height="${size}" aria-hidden="true" focusable="false">
-        <path d="M 18 18 L 62 18 L 68 68 L 12 68 Z" fill="${item.primary}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M 28 18 L 40 42 L 52 18" fill="none" stroke="${item.trim}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="16" y="48" width="48" height="9" rx="3" fill="${item.trim}" stroke="${ink}" stroke-width="2.5"/>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="${size}" height="${size}" aria-hidden="true" focusable="false">
+        <path d="M 18 16 L 70 16 L 76 74 L 12 74 Z" fill="${item.primary}" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M 52 16 L 34 44 L 40 48 L 58 18 Z" fill="#334155" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M 28 16 L 52 46 L 57 42 L 35 16 Z" fill="${item.trim}" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
+        <rect x="14" y="50" width="60" height="9" rx="3" fill="${item.trim}" stroke="${ink}" stroke-width="2.4"/>
+        <ellipse cx="44" cy="54.5" rx="6.5" ry="4.5" fill="${item.trim}" stroke="${ink}" stroke-width="2.2"/>
       </svg>
     `.trim();
   }

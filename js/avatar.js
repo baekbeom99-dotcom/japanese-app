@@ -158,7 +158,7 @@ const AvatarModule = (() => {
     }, { signal: ac.signal });
   }
 
-  const QUIZ_TARGETS = ['straw_doll', 'bullseye', 'apple', 'watermelon', 'daruma'];
+  const QUIZ_TARGETS = ['bonsai', 'straw_doll', 'cactus', 'bullseye', 'apple', 'watermelon', 'daruma'];
 
   const CARD_ACTIONS = [
     { id: 'slash',    label: '⚡ 질풍 쌍검 베기!',   leftPose: 'slash',    rightPose: 'guard' },
@@ -188,18 +188,20 @@ const AvatarModule = (() => {
     return `
       <div class="quiz-arena" id="quiz-arena" data-target-kind="${targetKind}">
         <div class="quiz-arena__ninja" id="arena-ninja">
-          ${AnimeSVG.mascot(mood, 84, { equipped, pose: 'idle' })}
+          ${AnimeSVG.mascot(mood, 88, { equipped, pose: 'idle' })}
         </div>
         <div class="quiz-arena__center">
           <div class="speech-bubble" id="quiz-mascot-msg">${mascotMsg}</div>
           <div class="quiz-arena__lane">
+            <div class="quiz-arena__trail" id="arena-trail" aria-hidden="true"></div>
             <div class="quiz-arena__shuriken" id="arena-shuriken" aria-hidden="true">
-              ${AnimeSVG.shurikenItem(equipped.shuriken, 38)}
+              ${AnimeSVG.shurikenItem(equipped.shuriken, 40)}
             </div>
+            <div class="quiz-arena__impact" id="arena-impact" aria-hidden="true"></div>
           </div>
         </div>
         <div class="quiz-arena__target" id="arena-target">
-          ${AnimeSVG.quizTarget(targetKind, 'idle', 82)}
+          ${AnimeSVG.quizTarget(targetKind, 'idle', 88)}
         </div>
       </div>
     `;
@@ -218,7 +220,7 @@ const AvatarModule = (() => {
     const equipped = Storage.getEquippedAvatar();
     const targetKind = arena.dataset.targetKind || 'straw_doll';
 
-    ninjaEl.innerHTML = AnimeSVG.mascot(isCorrect ? 'happy' : 'encourage', 88, {
+    ninjaEl.innerHTML = AnimeSVG.mascot(isCorrect ? 'happy' : 'encourage', 90, {
       equipped,
       pose: 'throw',
     });
@@ -230,7 +232,7 @@ const AvatarModule = (() => {
 
     setTimeout(() => {
       if (!document.body.contains(targetEl)) return;
-      targetEl.innerHTML = AnimeSVG.quizTarget(targetKind, isCorrect ? 'hit' : 'miss', 84);
+      targetEl.innerHTML = AnimeSVG.quizTarget(targetKind, isCorrect ? 'hit' : 'miss', 88);
     }, 280);
   }
 

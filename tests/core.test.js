@@ -44,16 +44,20 @@ test('AnimeSVG는 유효한 viewBox, xmlns, 고유 ID를 가진 Parametric SVG�
   });
   const m2 = AnimeSVG.mascot('encourage', 120, { pose: 'kick', flipX: true });
   assert.match(m1, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
-  assert.match(m1, /viewBox="0 0 180 180"/);
+  assert.match(m1, /viewBox="0 0 200 200"/);
   assert.match(m1, /role="img"/);
+  assert.match(m1, /id="mascot-tail"/);
+  assert.match(m1, /id="mascot-outfit"/);
   assert.match(m1, /id="mascot-weapon"/);
   assert.match(m2, /scale\(-1, 1\)/);
   assert.notEqual(m1, m2);
 
-  for (const kind of ['straw_doll', 'bullseye', 'apple', 'watermelon', 'daruma']) {
-    const t = AnimeSVG.quizTarget(kind, 'idle', 88);
-    assert.match(t, /viewBox="0 0 110 110"/);
-    assert.match(t, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+  for (const kind of ['straw_doll', 'bullseye', 'apple', 'watermelon', 'daruma', 'bonsai', 'cactus']) {
+    for (const st of ['idle', 'hit', 'miss']) {
+      const t = AnimeSVG.quizTarget(kind, st, 88);
+      assert.match(t, /viewBox="0 0 120 120"/);
+      assert.match(t, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+    }
   }
 
   for (const item of AVATAR_ITEMS) {
